@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Climbing Log</title>
+    
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+h1 {
+    color:#333;
+    font: arial;
+}
+.header-button {
+    width: 100%;
+    background: linear-gradient(90deg, #3498db 50%, #e74c3c 50%);
+    border: none;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+}
+.header-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header-left, .header-right {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    flex: 1;
+    text-align: center;
+}
+.header-left {
+    opacity: 1;
+}
+.header-right {
+    opacity: 0.5;
+}
+.header-button.flipped .header-left {
+    opacity: 0.5;
+}
+.header-button.flipped .header-right {
+    opacity: 1;
+}
+.search-container {
+    margin-bottom: 25px;
+}
+.search-bar {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+.search-bar:focus {
+    outline: none;
+    border-color: #3498db;
+}
+.add-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #2ecc71;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.add-btn:hover {
+    background-color: #27ae60;
+}
+.climb-list, .holds-list {
+    list-style: none;
+    padding: 0;
+}
+.climb-item, .hold-item {
+    background: white;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+}
+.climb-item.hidden, .hold-item.hidden {
+    display: none;
+}
+.climb-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+.hold-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #e74c3c;
+    margin-bottom: 10px;
+}
+.climb-details, .hold-details {
+    color: #666;
+    font-size: 14px;
+}
+.difficulty {
+    display: inline-block;
+    background: #3498db;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+.count-badge {
+    display: inline-block;
+    background: #e74c3c;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+.edit-btn, .delete-btn {
+    background: #95a5a6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 8px;
+    margin-top: 8px;
+}
+.edit-btn:hover {
+    background: #7f8c8d;
+}
+.delete-btn {
+    background: #e74c3c;
+}
+.delete-btn:hover {
+    background: #c0392b;
+}
+.loading {
+    text-align: center;
+    color: #666;
+}
+.no-results {
+    text-align: center;
+    color: #999;
+    padding: 40px;
+    background: white;
+    border-radius: 8px;
+}
+.view-climbs, .view-holds {
+    display: block;
+}
+.view-climbs.hidden, .view-holds.hidden {
+    display: none;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+.modal.show {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.modal-header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: #3498db;
+}
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+.btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.btn-primary {
+    background: #3498db;
+    color: white;
+}
+.btn-primary:hover {
+    background: #2980b9;
+}
+.btn-success {
+    background: #2ecc71;
+    color: white;
+}
+.btn-success:hover {
+    background: #27ae60;
+}
+.btn-cancel {
+    background: #95a5a6;
+    color: white;
+}
+.btn-cancel:hover {
+    background: #7f8c8d;
+}body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+.header-button {
+    width: 100%;
+    background: linear-gradient(90deg, #3498db 50%, #e74c3c 50%);
+    border: none;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+}
+.header-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header-left, .header-right {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    flex: 1;
+    text-align: center;
+}
+.header-left {
+    opacity: 1;
+}
+.header-right {
+    opacity: 0.5;
+}
+.header-button.flipped .header-left {
+    opacity: 0.5;
+}
+.header-button.flipped .header-right {
+    opacity: 1;
+}
+.search-container {
+    margin-bottom: 25px;
+}
+.search-bar {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+.search-bar:focus {
+    outline: none;
+    border-color: #3498db;
+}
+.add-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #2ecc71;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.add-btn:hover {
+    background-color: #27ae60;
+}
+.climb-list, .holds-list {
+    list-style: none;
+    padding: 0;
+}
+.climb-item, .hold-item {
+    background: white;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+}
+.climb-item.hidden {
+    display: none;
+}
+.climb-name {
+    font-size: 22px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+.climb-details {
+    color: #666;
+    font-size: 18px;
+}
+.difficulty {
+    display: inline-block;
+    background: #3498db;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+.count-badge {
+    display: inline-block;
+    background: #e74c3c;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+.edit-btn, .delete-btn {
+    background: #95a5a6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 8px;
+    margin-top: 8px;
+}
+.edit-btn:hover {
+    background: #7f8c8d;
+}
+.delete-btn {
+    background: #e74c3c;
+}
+.delete-btn:hover {
+    background: #c0392b;
+}
+.loading {
+    text-align: center;
+    color: #666;
+}
+.no-results {
+    text-align: center;
+    color: #999;
+    padding: 40px;
+    background: white;
+    border-radius: 8px;
+}
+.view-climbs, .view-holds {
+    display: block;
+}
+.view-climbs.hidden, .view-holds.hidden {
+    display: none;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+.modal.show {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.modal-header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: #3498db;
+}
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+.btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.btn-primary {
+    background: #3498db;
+    color: white;
+}
+.btn-primary:hover {
+    background: #2980b9;
+}
+.btn-success {
+    background: #2ecc71;
+    color: white;
+}
+.btn-success:hover {
+    background: #27ae60;
+}
+.btn-cancel {
+    background: #95a5a6;
+    color: white;
+}
+.btn-cancel:hover {
+    background: #7f8c8d;
+}
+.status {
+    color: #666;
+    font: 18px arial;
+}
+    </style>
+</head>
+<body>
+    <h1>Spraywall Database</h1>
+    <div class="search-container">
+        <input 
+            type="text" 
+            id="searchBar"
+            class="search-bar" 
+            placeholder="Search by hold"
+            onkeyup="filterClimbs()"
+        >
+        <button class="add-btn" onclick="openAddModal()">+ Add New Climb</button>
+    </div>
+    <p id="result-tally" class="status"></p>
+    <div id="climbList" class="loading">Loading climbs...</div>
+
+    <!-- Add/Edit Modal -->
+    <div id="climbModal" class="modal">
+        <div class="modal-content">
+            <div id="modalTitle" class="modal-header">Add New Climb</div>
+            <form id="climbForm">
+                <input type="hidden" id="editIndex" value="-1">
+                
+                <div class="form-group">
+                    <label for="climbName">Name</label>
+                    <input type="text" id="climbName">
+                </div>
+                
+                <div class="form-group">
+                    <label for="climbHolds">Holds *</label>
+                    <input type="text" id="climbHolds" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="climbFeet">Feet</label>
+                    <input type="text" id="climbFeet">
+                </div>
+                
+                <div class="form-group">
+                    <label for="climbDate">Date</label>
+                    <input type="date" id="climbDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="climbDifficulty">Difficulty (V-Scale) *</label>
+                    <select id="climbDifficulty">
+                        <option value="">Select difficulty...</option>
+                        <option value="0">V0</option>
+                        <option value="1">V1</option>
+                        <option value="2">V2</option>
+                        <option value="3">V3</option>
+                        <option value="4">V4</option>
+                        <option value="5">V5</option>
+                        <option value="6">V6</option>
+                        <option value="7">V7</option>
+                        <option value="8">V8</option>
+                        <option value="9">V9</option>
+                        <option value="10">V10</option>
+                        <option value="11">V11</option>
+                        <option value="12">V12</option>
+                        <option value="13">V13</option>
+                        <option value="14">V14</option>
+                        <option value="15">V15</option>
+                    </select>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" id="submitBtn" class="btn btn-success">Add Climb</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let allClimbs = [];
+        let currentView = 'climbs';
+
+        async function loadClimbs() {
+            try {
+                const response = await fetch('/api/climbs');
+                allClimbs = await response.json();
+                
+                displayClimbs(allClimbs);
+                
+            } catch (error) {
+                document.getElementById('climbList').innerHTML = 
+                    '<p>Error loading climbs. Make sure the server is running.</p>';
+                console.error('Error:', error);
+            }
+        }
+
+        function displayClimbs(climbs) {
+            const listDiv = document.getElementById('climbList');
+            
+            if (climbs.length === 0) {
+                listDiv.innerHTML = '<div class="no-results">No climbs found.</div>';
+                return;
+            }
+            
+            let html = '<ul class="climb-list">';
+            
+            climbs.forEach((climb, index) => {
+                if (!climb.name) { climb.name = climb.holds.split(" ")[0] + " " + climb.holds.split(" ")[1]; }
+                if (!climb.feet) { climb.feet = "N/A"; }
+                if (!climb.date) { climb.date = "N/A"; }
+                if (!climb.difficulty) { climb.difficulty = "fun"; }
+                climb.holds += " ";
+                html += `
+                    <li class="climb-item" data-index="${index}" data-holds="${climb.holds.toLowerCase()}">
+                        <div class="climb-name">${climb.name}</div>
+                        <div class="climb-details">
+                            <strong>Holds:</strong> ${climb.holds}<br>
+                            <strong>Feet:</strong> ${climb.feet}<br>
+                            <strong>Date:</strong> ${climb.date}
+                        </div>
+                        <span class="difficulty">V${climb.difficulty}</span>
+                        <div>
+                            <button class="edit-btn" onclick="openEditModal(${index})">Edit</button>
+                            <button class="delete-btn" onclick="deleteClimb(${index})">Delete</button>
+                        </div>
+                    </li>
+                `;
+            });
+            
+            html += '</ul>';
+            listDiv.innerHTML = html;
+        }
+
+        function filterClimbs() {
+            const searchTerm = document.getElementById('searchBar').value.toLowerCase();
+            const climbItems = document.querySelectorAll('.climb-item');
+            const tally = document.getElementById("result-tally")
+            let visibleCount = 0;
+
+            climbItems.forEach(item => {
+                const holds = item.getAttribute('data-holds');
+                
+                if (holds.includes(searchTerm + " ")) {
+                    item.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    item.classList.add('hidden');
+                }
+                
+            });
+
+            tally.innerHTML = "";
+
+            if (visibleCount === 0 && searchTerm !== '') {
+                const listDiv = document.getElementById('climbList');
+                const existingList = listDiv.querySelector('.climb-list');
+                if (existingList) {
+                    existingList.style.display = 'none';
+                }
+                
+                let noResults = listDiv.querySelector('.no-results');
+                if (!noResults) {
+                    noResults = document.createElement('div');
+                    noResults.className = 'no-results';
+                    listDiv.appendChild(noResults);
+                }
+                noResults.textContent = `No climbs found with "${searchTerm}" holds.`;
+                noResults.style.display = 'block';
+            } else {
+                const existingList = document.getElementById('climbList').querySelector('.climb-list');
+                if (existingList) {
+                    existingList.style.display = 'block';
+                }
+                const noResults = document.getElementById('climbList').querySelector('.no-results');
+                if (noResults) {
+                    noResults.style.display = 'none';
+                }
+            }
+
+            if (visibleCount > 1 && searchTerm != '') {
+                tally.innerHTML = visibleCount + " routes use \"" + searchTerm + "\"";
+            } else if (visibleCount == 1 && searchTerm != '') {
+                tally.innerHTML = visibleCount + " route uses \"" + searchTerm + "\"";
+            }
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Climb';
+            document.getElementById('submitBtn').textContent = 'Add Climb';
+            document.getElementById('submitBtn').className = 'btn btn-success';
+            document.getElementById('editIndex').value = '-1';
+            
+            // Reset form and set today's date
+            document.getElementById('climbForm').reset();
+            document.getElementById('climbDate').valueAsDate = new Date();
+            
+            document.getElementById('climbModal').classList.add('show');
+        }
+
+        function openEditModal(index) {
+            const climb = allClimbs[index];
+            
+            document.getElementById('modalTitle').textContent = 'Edit Climb';
+            document.getElementById('submitBtn').textContent = 'Save Changes';
+            document.getElementById('submitBtn').className = 'btn btn-primary';
+            
+            document.getElementById('editIndex').value = index;
+            document.getElementById('climbName').value = climb.name;
+            document.getElementById('climbHolds').value = climb.holds;
+            document.getElementById('climbFeet').value = climb.feet;
+            document.getElementById('climbDate').value = climb.date;
+            document.getElementById('climbDifficulty').value = climb.difficulty;
+            
+            document.getElementById('climbModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('climbModal').classList.remove('show');
+        }
+
+        document.getElementById('climbForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const index = parseInt(document.getElementById('editIndex').value);
+            const climbData = {
+                name: document.getElementById('climbName').value,
+                holds: document.getElementById('climbHolds').value,
+                feet: document.getElementById('climbFeet').value,
+                date: document.getElementById('climbDate').value,
+                difficulty: parseInt(document.getElementById('climbDifficulty').value)
+            };
+            
+            try {
+                let response;
+                if (index === -1) {
+                    // Add new climb
+                    response = await fetch('/api/climbs', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(climbData)
+                    });
+                } else {
+                    // Update existing climb
+                    response = await fetch(`/api/climbs/${index}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(climbData)
+                    });
+                }
+                
+                if (response.ok) {
+                    closeModal();
+                    await loadClimbs();
+                } else {
+                    alert('Error saving climb');
+                }
+            } catch (error) {
+                alert('Error saving climb');
+                console.error('Error:', error);
+            }
+        });
+
+        async function deleteClimb(index) {
+            if (!confirm(`Are you sure you want to delete "${allClimbs[index].name}"?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/climbs/${index}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    await loadClimbs();
+                } else {
+                    alert('Error deleting climb');
+                }
+            } catch (error) {
+                alert('Error deleting climb');
+                console.error('Error:', error);
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('climbModal').addEventListener('click', (e) => {
+            if (e.target.id === 'climbModal') {
+                closeModal();
+            }
+        });
+        
+        loadClimbs();
+    </script>
+</body>
+</html>
