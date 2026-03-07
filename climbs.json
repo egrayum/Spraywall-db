@@ -1,16 +1,16 @@
 [
     {
         "name": "XOR Lust",
-        "holds": "Swirl XOR Lust Duplicity U ",
+        "holds": "Swirl XOR Lust Duplicity U",
         "feet": "N R Nib",
         "date": "",
-        "difficulty": 5
+        "difficulty": "4-7"
     },
     {
         "name": "Go Up",
         "holds": "Greed Set Go Up",
         "feet": "N/A",
         "date": "",
-        "difficulty": 5
+        "difficulty": "4-7"
     }
 ]

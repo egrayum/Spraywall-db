@@ -329,30 +329,35 @@ h1 {
 .add-btn:hover {
     background-color: #27ae60;
 }
-.climb-list, .holds-list {
+.climb-list {
     list-style: none;
     padding: 0;
 }
-.climb-item, .hold-item {
+.climb-item {
     background: white;
     padding: 20px;
     margin-bottom: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     position: relative;
+
 }
 .climb-item.hidden {
     display: none;
 }
 .climb-name {
+    text-align: left;
     font-size: 22px;
     font-weight: bold;
     color: #2c3e50;
     margin-bottom: 10px;
 }
 .climb-details {
+    margin: 0;
+    text-align: left;
     color: #666;
     font-size: 18px;
+    width: 75%;
 }
 .difficulty {
     display: inline-block;
@@ -363,14 +368,14 @@ h1 {
     font-weight: bold;
     margin-top: 8px;
 }
-.count-badge {
+.climb-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
     display: inline-block;
-    background: #e74c3c;
-    color: white;
-    padding: 4px 12px;
-    border-radius: 4px;
-    font-weight: bold;
-    margin-top: 8px;
+    text-align: right;
+    width: 25%
 }
 .edit-btn, .delete-btn {
     background: #95a5a6;
@@ -382,6 +387,8 @@ h1 {
     font-size: 14px;
     margin-right: 8px;
     margin-top: 8px;
+    display: inline;
+    text-align: right;
 }
 .edit-btn:hover {
     background: #7f8c8d;
@@ -501,18 +508,49 @@ h1 {
     color: #666;
     font: 18px arial;
 }
+.inline-button {
+    font: 18px arial;
+    color:#27ae60;
+    margin: -2px;
+    border: 0;
+    background: rgba(0,0,0,0);
+}
+.clear-btn {
+    position: absolute;
+    right: 10px;
+    top: 15%;
+    background: rgba(0,0,0,0);
+    color: #666;
+    border: none;
+    border-radius: 4px;
+    width: 30px;
+    height: 30px;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 0 4px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.clear-btn:hover {
+    background: #ccc;
+}
     </style>
 </head>
 <body>
     <h1>Spraywall Database</h1>
     <div class="search-container">
-        <input 
-            type="text" 
-            id="searchBar"
-            class="search-bar" 
-            placeholder="Search by hold"
-            onkeyup="filterClimbs()"
-        >
+        <div style="position: relative;">
+            <input 
+                type="text" 
+                id="searchBar" 
+                class="search-bar" 
+                placeholder="Search by hold name"
+                onkeyup="filterClimbs()"
+            >
+            <button id="clearBtn" class="clear-btn" onclick="clearSearch()" style="display: none;">×</button>
+        </div>
         <button class="add-btn" onclick="openAddModal()">+ Add New Climb</button>
     </div>
     <p id="result-tally" class="status"></p>
@@ -546,25 +584,13 @@ h1 {
                 </div>
                 
                 <div class="form-group">
-                    <label for="climbDifficulty">Difficulty (V-Scale) *</label>
+                    <label for="climbDifficulty">Difficulty</label>
                     <select id="climbDifficulty">
                         <option value="">Select difficulty...</option>
-                        <option value="0">V0</option>
-                        <option value="1">V1</option>
-                        <option value="2">V2</option>
-                        <option value="3">V3</option>
-                        <option value="4">V4</option>
-                        <option value="5">V5</option>
-                        <option value="6">V6</option>
-                        <option value="7">V7</option>
-                        <option value="8">V8</option>
-                        <option value="9">V9</option>
-                        <option value="10">V10</option>
-                        <option value="11">V11</option>
-                        <option value="12">V12</option>
-                        <option value="13">V13</option>
-                        <option value="14">V14</option>
-                        <option value="15">V15</option>
+                        <option>1-4</option>
+                        <option>4-7</option>
+                        <option>7-9</option>
+                        <option>10+</option>
                     </select>
                 </div>
                 
@@ -610,16 +636,25 @@ h1 {
                 if (!climb.date) { climb.date = "N/A"; }
                 if (!climb.difficulty) { climb.difficulty = "fun"; }
                 climb.holds += " ";
+                var hold_links = ""
+                const split_holds = climb.holds.split(" ")
+                
+                split_holds.forEach((hold, i) => {
+                    var oawiehjfclaif = split_holds[i];
+                    if (split_holds[i] != "") {
+                        hold_links += `<button class="inline-button" onclick="fillSearch('${split_holds[i]}')">${split_holds[i]}</button>`;
+                    }
+                });
                 html += `
                     <li class="climb-item" data-index="${index}" data-holds="${climb.holds.toLowerCase()}">
-                        <div class="climb-name">${climb.name}</div>
                         <div class="climb-details">
-                            <strong>Holds:</strong> ${climb.holds}<br>
+                            <div class="climb-name">${climb.name}</div>
+                            <strong>Holds:</strong> ${hold_links}<br>
                             <strong>Feet:</strong> ${climb.feet}<br>
-                            <strong>Date:</strong> ${climb.date}
+                            <strong>Date:</strong> ${climb.date}<br>
+                            <block class="difficulty">V${climb.difficulty}</block>
                         </div>
-                        <span class="difficulty">V${climb.difficulty}</span>
-                        <div>
+                        <div class="climb-actions">
                             <button class="edit-btn" onclick="openEditModal(${index})">Edit</button>
                             <button class="delete-btn" onclick="deleteClimb(${index})">Delete</button>
                         </div>
@@ -631,11 +666,19 @@ h1 {
             listDiv.innerHTML = html;
         }
 
+        function fillSearch(insert) {
+            document.getElementById("searchBar").value = insert;
+            filterClimbs();
+        }
+
         function filterClimbs() {
             const searchTerm = document.getElementById('searchBar').value.toLowerCase();
             const climbItems = document.querySelectorAll('.climb-item');
-            const tally = document.getElementById("result-tally")
+            const tally = document.getElementById("result-tally");
+            const clearBtn = document.getElementById('clearBtn');
             let visibleCount = 0;
+
+            clearBtn.style.display = searchTerm ? 'flex' : 'none';
 
             climbItems.forEach(item => {
                 const holds = item.getAttribute('data-holds');
@@ -718,6 +761,12 @@ h1 {
             document.getElementById('climbModal').classList.remove('show');
         }
 
+        function clearSearch() {
+            document.getElementById('searchBar').value = '';
+            filterClimbs();
+            document.getElementById('clearBtn').style.display = 'none';
+        }
+
         document.getElementById('climbForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -727,7 +776,7 @@ h1 {
                 holds: document.getElementById('climbHolds').value,
                 feet: document.getElementById('climbFeet').value,
                 date: document.getElementById('climbDate').value,
-                difficulty: parseInt(document.getElementById('climbDifficulty').value)
+                difficulty: document.getElementById('climbDifficulty').value
             };
             
             try {
