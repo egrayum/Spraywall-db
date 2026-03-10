@@ -25,9 +25,13 @@ def write_all_entries(entries):
 
 def write_entry(name, holds, feet, date, difficulty):
     entries = read_entries()
+    
+    # Convert holds string to array of tags
+    holds_array = [h.strip().lower() for h in holds.split(',')]
+    
     new_entry = {
         "name": name,
-        "holds": holds,
+        "holds": holds_array,  # Now an array
         "feet": feet,
         "date": date,
         "difficulty": difficulty
