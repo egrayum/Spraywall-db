@@ -374,8 +374,12 @@
             right: 0;
             margin: 0;
             display: inline-block;
+<<<<<<< Updated upstream
             text-align: right;
             width: 25%
+=======
+            width: fit-content;
+>>>>>>> Stashed changes
         }
         .edit-btn, .delete-btn {
             background: #95a5a6;
@@ -387,8 +391,12 @@
             font-size: 14px;
             margin-right: 8px;
             margin-top: 8px;
+<<<<<<< Updated upstream
             display: inline;
             text-align: right;
+=======
+            display: block;
+>>>>>>> Stashed changes
         }
         .edit-btn:hover {
             background: #7f8c8d;
@@ -550,6 +558,45 @@
             font-size: 12px;
             font-weight: 500;
         }
+<<<<<<< Updated upstream
+=======
+        .holds-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .hold-suggestion {
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .hold-suggestion:hover {
+            background: #f8f9fa;
+        }
+        .hold-suggestion:last-child {
+            border-bottom: none;
+        }
+        .suggestion-name {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        .suggestion-count {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+>>>>>>> Stashed changes
     </style>
 </head>
 <body>
@@ -562,8 +609,11 @@
                 class="search-bar" 
                 placeholder="Search by hold name"
                 onkeyup="filterClimbs()"
+                onfocus="showHoldsSuggestions()"
+                onblur="hideHoldsSuggestions()"
             >
             <button id="clearBtn" class="clear-btn" onclick="clearSearch()" style="display: none;">×</button>
+            <div id="holdsSuggestions" class="holds-suggestions" style="display: none;"></div>
         </div>
         <button class="add-btn" onclick="openAddModal()">+ Add New Climb</button>
     </div>
@@ -647,7 +697,11 @@
             climbs.forEach((climb, index) => {
                 const holdsArray = Array.isArray(climb.holds) ? climb.holds : [climb.holds];
                 const holdsDisplay = holdsArray.map(h => `<span class="hold-tag">${h}</span>`).join('');
+<<<<<<< Updated upstream
                 
+=======
+
+>>>>>>> Stashed changes
                 if (!climb.name) { climb.name = climb.holds.split(" ")[0] + " " + climb.holds.split(" ")[1]; }
                 if (!climb.feet) { climb.feet = "N/A"; }
                 if (!climb.date) { climb.date = "N/A"; }
@@ -663,7 +717,7 @@
                 });
 
                 html += `
-                    <li class="climb-item" data-index="${index}" data-holds="${climb.holds.toLowerCase()}">
+                    <li class="climb-item" data-index="${index}" data-holds="${JSON.stringify(holdsArray)}">
                         <div class="climb-details">
                             <div class="climb-name">${climb.name}</div>
                             <strong>Holds:</strong> ${hold_links}<br>
@@ -698,7 +752,11 @@
             clearBtn.style.display = searchTerm ? 'flex' : 'none';
 
             climbItems.forEach(item => {
+<<<<<<< Updated upstream
                 const holds = item.getAttribute('data-holds');
+=======
+                const holdsData = item.getAttribute('data-holds');
+>>>>>>> Stashed changes
                 const holdsArray = JSON.parse(holdsData);
 
                 // Check if any hold tag includes the search term
@@ -710,9 +768,9 @@
                 } else {
                     item.classList.add('hidden');
                 }
-                
-            });
 
+            });
+                
             tally.innerHTML = "";
 
             if (visibleCount === 0 && searchTerm !== '') {
@@ -770,10 +828,15 @@
             
             document.getElementById('editIndex').value = index;
             document.getElementById('climbName').value = climb.name;
+<<<<<<< Updated upstream
 
             const holdsArray = Array.isArray(climb.holds) ? climb.holds : [climb.holds];
             document.getElementById('climbHolds').value = holdsArray.join(', ');
 
+=======
+            const holdsArray = Array.isArray(climb.holds) ? climb.holds : [climb.holds];
+            document.getElementById('climbHolds').value = holdsArray.join(', ');
+>>>>>>> Stashed changes
             document.getElementById('climbFeet').value = climb.feet;
             document.getElementById('climbDate').value = climb.date;
             document.getElementById('climbDifficulty').value = climb.difficulty;
@@ -867,6 +930,47 @@
                 closeModal();
             }
         });
+
+        function showHoldsSuggestions() {
+            const holdsMap = {};
+            
+            // Gather all unique holds
+            allClimbs.forEach(climb => {
+                const holdsArray = Array.isArray(climb.holds) ? climb.holds : [climb.holds];
+                holdsArray.forEach(hold => {
+                    const holdLower = hold.toLowerCase();
+                    holdsMap[holdLower] = (holdsMap[holdLower] || 0) + 1;
+                });
+            });
+            
+            // Sort by count
+            const sortedHolds = Object.entries(holdsMap).sort((a, b) => b[1] - a[1]);
+            
+            let html = '';
+            sortedHolds.forEach(([hold, count]) => {
+                html += `
+                    <div class="hold-suggestion" onmousedown="selectHold('${hold}')">
+                        <span class="suggestion-name">${hold}</span>
+                        <span class="suggestion-count">${count} climb${count > 1 ? 's' : ''}</span>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('holdsSuggestions').innerHTML = html;
+            document.getElementById('holdsSuggestions').style.display = 'block';
+        }
+
+        function hideHoldsSuggestions() {
+            setTimeout(() => {
+                document.getElementById('holdsSuggestions').style.display = 'none';
+            }, 200); // Delay to allow click to register
+        }
+
+        function selectHold(hold) {
+            document.getElementById('searchBar').value = hold;
+            filterClimbs();
+            document.getElementById('holdsSuggestions').style.display = 'none';
+        }
         
         loadClimbs();
     </script>
