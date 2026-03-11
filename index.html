@@ -671,7 +671,7 @@
                 if (!climb.feet) { climb.feet = "N/A"; }
                 if (!climb.date) { climb.date = "N/A"; }
                 if (!climb.difficulty) { climb.difficulty = "fun"; }
-                climb.holds += " ";
+                climb.holds;
                 var hold_links = ""
                 const split_holds = climb.holds.split(" ")
                 
@@ -717,9 +717,10 @@
             clearBtn.style.display = searchTerm ? 'flex' : 'none';
 
             climbItems.forEach(item => {
-                const holds = item.getAttribute('data-holds');
+                // TBD:: split by space; change later for adding by tag??
+                const holds = item.getAttribute('data-holds').split(" ");
                 
-                if (holds.includes(searchTerm + " ")) {
+                if (holds.includes(searchTerm) || searchTerm == "") {
                     item.classList.remove('hidden');
                     visibleCount++;
                 } else {
