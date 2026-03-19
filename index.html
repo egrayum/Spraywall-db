@@ -443,27 +443,6 @@
             margin-bottom: 20px;
             color: #2c3e50;
         }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #3498db;
-        }
         .modal-buttons {
             display: flex;
             gap: 10px;
@@ -577,6 +556,7 @@
                 type="text" 
                 id="searchBar" 
                 class="search-bar" 
+                autocomplete="off"
                 placeholder="Search by hold name"
                 onkeyup="filterClimbs(), filterHoldsSuggestions()"
                 onfocus="filterHoldsSuggestions()"
@@ -604,7 +584,18 @@
                 
                 <div class="form-group">
                     <label for="climbHolds">Holds *</label>
-                    <input type="text" id="climbHolds" required>
+                    <div style="position: relative;">
+                        <input 
+                            type="text" 
+                            id="climbHolds" 
+                            required
+                            autocomplete="off"
+                            onfocus="filterModalHoldsSuggestions()"
+                            onblur="hideModalHoldsSuggestions()"
+                            oninput="filterModalHoldsSuggestions()"
+                        >
+                        <div id="modalHoldsSuggestions" class="holds-suggestions" style="display: none;"></div>
+                    </div>
                 </div>
                 
                 <div class="form-group">
@@ -668,8 +659,8 @@
             
             climbs.forEach((climb, index) => {
                 if (!climb.name) { climb.name = climb.holds.split(" ")[0] + " " + climb.holds.split(" ")[1]; }
-                if (!climb.feet) { climb.feet = "N/A"; }
-                if (!climb.date) { climb.date = "N/A"; }
+                if (climb.feet) { climb.feet = `<strong>Feet:</strong> ${climb.feet}<br>`;}
+                if (climb.date) { climb.date =` <strong>Date:</strong> ${climb.date}<br>`; }
                 if (!climb.difficulty) { climb.difficulty = "fun"; }
                 climb.holds;
                 var hold_links = ""
@@ -686,8 +677,8 @@
                         <div class="climb-details">
                             <div class="climb-name">${climb.name}</div>
                             <strong>Holds:</strong> ${hold_links}<br>
-                            <strong>Feet:</strong> ${climb.feet}<br>
-                            <strong>Date:</strong> ${climb.date}<br>
+                            ${climb.feet}
+                            ${climb.date}
                             <block class="difficulty">V${climb.difficulty}</block>
                         </div>
                         <div class="climb-actions">
@@ -895,7 +886,7 @@
             
             // Sort by count
             const sortedHolds = Object.entries(holdsMap).sort((a, b) => b[1] - a[1]);
-            
+            console.log(sortedHolds);
 
             let html = '';
             sortedHolds.forEach(([hold, count]) => {
@@ -909,6 +900,17 @@
             });
 
             document.getElementById('holdsSuggestions').innerHTML = html;
+
+            html = '';
+            sortedHolds.forEach(([hold, count]) => {
+                html += `
+                    <div class="hold-suggestion" id="${('modal-hold-suggestion-' + hold)}" onmousedown="selectModalHold('${hold}')">
+                        <span class="suggestion-name">${hold}</span>
+                        <span class="suggestion-count">${count} climb${count > 1 ? 's' : ''}</span>
+                    </div>
+                `;
+            });
+            document.getElementById('modalHoldsSuggestions').innerHTML = html;
         }
 
         // filter list of suggestion divs based on search input
@@ -935,6 +937,45 @@
             document.getElementById('searchBar').value = hold;
             filterClimbs();
             document.getElementById('holdsSuggestions').style.display = 'none';
+        }
+
+
+        function filterModalHoldsSuggestions() {
+            const input = document.getElementById('climbHolds').value.toLowerCase();
+            const lastComma = input.lastIndexOf(' ');
+            const searchTerm = lastComma >= 0 ? input.slice(lastComma + 1).trim() : input.trim();
+            allSuggestions.forEach(function(item) {
+                if (item.includes('hold-suggestion-' + searchTerm)) {
+                    document.getElementById('modal-' + item).style.display = 'block';
+                } else {
+                    document.getElementById('modal-' + item).style.display = 'none';
+                }
+            });
+
+            document.getElementById('modalHoldsSuggestions').style.display = 'block';
+        }
+
+        function hideModalHoldsSuggestions() {
+            setTimeout(() => {
+                document.getElementById('modalHoldsSuggestions').style.display = 'none';
+            }, 200);
+        }
+
+        function selectModalHold(hold) {
+            const input = document.getElementById('climbHolds');
+            const currentValue = input.value;
+            const lastComma = currentValue.lastIndexOf(' ');
+            
+            if (lastComma >= 0) {
+                // Replace the last tag after the comma
+                input.value = currentValue.slice(0, lastComma + 1) + hold;
+            } else {
+                // Replace entire value
+                input.value = hold;
+            }
+            
+            input.focus();
+            document.getElementById('modalHoldsSuggestions').style.display = 'none';
         }
 
         // Close modal when clicking outside
