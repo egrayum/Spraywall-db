@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://kit.fontawesome.com/ff7f5f38b9.js" crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Climbing Log</title>
@@ -57,8 +58,8 @@
             margin-bottom: 25px;
         }
         .search-bar {
-            width: 100%;
-            padding: 12px 20px;
+            width: 47px;
+            padding: 12px 12px;
             font-size: 16px;
             border: 2px solid #ddd;
             border-radius: 8px;
@@ -68,9 +69,10 @@
         .search-bar:focus {
             outline: none;
             border-color: #3498db;
+            width: m-content;
         }
         .add-btn {
-            width: 100%;
+            width: 47px;
             padding: 14px;
             font-size: 16px;
             font-weight: bold;
@@ -297,33 +299,7 @@
         }
         .search-container {
             margin-bottom: 25px;
-        }
-        .search-bar {
-            width: 100%;
-            padding: 12px 20px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            margin-bottom: 10px;
-        }
-        .search-bar:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-        .add-btn {
-            width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-            background-color: #2ecc71;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .add-btn:hover {
-            background-color: #27ae60;
+            display: flexbox;
         }
         .climb-list {
             list-style: none;
@@ -510,7 +486,7 @@
         .clear-btn:hover {
             background: #ccc;
         }
-        .holds-suggestions {
+        /*.holds-grid {
             position: absolute;
             top: 100%;
             left: 0;
@@ -523,7 +499,7 @@
             overflow-y: auto;
             z-index: 100;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+        }*/
         .hold-suggestion {
             padding: 10px 15px;
             cursor: pointer;
@@ -546,26 +522,145 @@
             font-size: 12px;
             color: #7f8c8d;
         }
+        .holds-picker {
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .holds-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 40px;
+            max-height: 80px;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            margin: 0 10px 10px 10px;
+        }
+        .hold-chip {
+            background: #ecf0f1;
+            padding: 8px 12px;
+            border-radius: 16px;
+            cursor: pointer;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        .hold-chip:hover {
+            background: #d0d7da;
+        }
+        .hold-chip.selected {
+            background: #3498db;
+            color: white;
+        }
+        .selected-holds {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            min-height: 25px;
+            padding: 8px;
+            border: none;
+        }
+        .selected-tag {
+            background: #3498db;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .remove-tag {
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .placeholder {
+            color: #999;
+            font-style: italic;
+        }
+        /*.holds-input-container {
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            padding: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: flex-start;
+            min-height: 40px;
+        }*/
+        .holds-input-container:focus-within {
+            border-color: #3498db;
+        }
+        .holds-input {
+            flex: 1;
+            min-width: 150px;
+            border: none;
+            padding: 6px;
+            font-size: 16px;
+            outline: none;
+        }
+        .selected-tag {
+            background: #3498db;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+        .remove-tag {
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            line-height: 1;
+        }
+        .remove-tag:hover {
+            opacity: 0.8;
+        }
+        #holdsSuggestions {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            margin-top: 5px;
+        }
+        #holdsGrid {
+            max-height: 200px;
+            overflow-y: auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+        }
     </style>
 </head>
 <body>
     <h1>Spraywall Database</h1>
     <div class="search-container">
-        <div style="position: relative;">
+        <div style="position: relative; width: 100%; display: inline-block;">
+            <i id="searchIcon" class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 14px; pointer-events: none;"></i>
             <input 
                 type="text" 
                 id="searchBar" 
                 class="search-bar" 
                 autocomplete="off"
-                placeholder="Search by hold name"
                 onkeyup="filterClimbs(), filterHoldsSuggestions()"
-                onfocus="filterHoldsSuggestions()"
+                onfocus="filterHoldsSuggestions(), showHoldsSuggestions()"
                 onblur="hideHoldsSuggestions()"
             >
+            <button class="add-btn" onclick="openAddModal()">+</button>
             <button id="clearBtn" class="clear-btn" onclick="clearSearch()" style="display: none;">×</button>
             <div id="holdsSuggestions" class="holds-suggestions" style="display: none;"></div>
         </div>
-        <button class="add-btn" onclick="openAddModal()">+ Add New Climb</button>
+        <!--<div style="text-align: right; width: 49%; display: inline-block; vertical-align: top;">
+            
+        </div>-->
     </div>
     <p id="result-tally" class="status"></p>
     <div id="climbList" class="loading">Loading climbs...</div>
@@ -584,18 +679,23 @@
                 
                 <div class="form-group">
                     <label for="climbHolds">Holds *</label>
-                    <div style="position: relative;">
+                    
+                    <div class="holds-input-container">
+                        <div class="selected-holds" id="selectedHolds"></div>
                         <input 
                             type="text" 
                             id="climbHolds" 
-                            required
+                            class="holds-input"
+                            placeholder="Type hold name and press Enter..."
                             autocomplete="off"
-                            onfocus="filterModalHoldsSuggestions()"
-                            onblur="hideModalHoldsSuggestions()"
+                            onkeypress="handleHoldsInput(event)"
+                            onfocus="showHoldsPicker()"
+                            onblur="hideHoldsPicker()"
                             oninput="filterModalHoldsSuggestions()"
                         >
-                        <div id="modalHoldsSuggestions" class="holds-suggestions" style="display: none;"></div>
                     </div>
+                    
+                    <div id="holdsGrid" class="holds-grid"></div>
                 </div>
                 
                 <div class="form-group">
@@ -631,6 +731,7 @@
         let allClimbs = [];
         let currentView = 'climbs';
         let allSuggestions = new Set([]);
+        let selectedHolds = [];
 
         async function loadClimbs() {
             try {
@@ -638,7 +739,7 @@
                 allClimbs = await response.json();
                 
                 displayClimbs(allClimbs);
-                loadHoldsSuggestions();
+                //loadHoldsSuggestions();
                 
             } catch (error) {
                 document.getElementById('climbList').innerHTML = 
@@ -649,36 +750,30 @@
 
         function displayClimbs(climbs) {
             const listDiv = document.getElementById('climbList');
-            
             if (climbs.length === 0) {
                 listDiv.innerHTML = '<div class="no-results">No climbs found.</div>';
                 return;
             }
-            
             let html = '<ul class="climb-list">';
-            
             climbs.forEach((climb, index) => {
-                if (!climb.name) { climb.name = climb.holds.split(" ")[0] + " " + climb.holds.split(" ")[1]; }
-                if (climb.feet) { climb.feet = `<strong>Feet:</strong> ${climb.feet}<br>`;}
-                if (climb.date) { climb.date =` <strong>Date:</strong> ${climb.date}<br>`; }
-                if (!climb.difficulty) { climb.difficulty = "fun"; }
-                climb.holds;
-                var hold_links = ""
-                const split_holds = climb.holds.split(" ")
+                // Parse holds - handle both array and comma-separated string
+                let holdsArray;
+                if (Array.isArray(climb.holds)) {
+                    holdsArray = climb.holds;
+                } else if (typeof climb.holds === 'string') {
+                    holdsArray = climb.holds.split(',').map(h => h.trim());
+                } else {
+                    holdsArray = [];
+                }
                 
-                split_holds.forEach((hold, i) => {
-                    var oawiehjfclaif = split_holds[i];
-                    if (split_holds[i] != "") {
-                        hold_links += `<button class="inline-button" onclick="fillSearch('${split_holds[i]}')">${split_holds[i]}</button>`;
-                    }
-                });
+                const holdsDisplay = holdsArray.map(h => `<span class="hold-tag">${h}</span>`).join('');
+                
                 html += `
-                    <li class="climb-item" data-index="${index}" data-holds="${climb.holds.toLowerCase()}">
+                    <li class="climb-item" data-index="${index}" data-holds='${JSON.stringify(holdsArray).toLowerCase()}'>
                         <div class="climb-details">
                             <div class="climb-name">${climb.name}</div>
-                            <strong>Holds:</strong> ${hold_links}<br>
-                            ${climb.feet}
-                            ${climb.date}
+                            <strong>Holds:</strong> <div class="hold-tags">${holdsDisplay}</div>
+                            <strong>Feet:</strong> ${climb.feet}<br>
                             <block class="difficulty">V${climb.difficulty}</block>
                         </div>
                         <div class="climb-actions">
@@ -688,70 +783,69 @@
                     </li>
                 `;
             });
-            
             html += '</ul>';
             listDiv.innerHTML = html;
         }
 
-        function fillSearch(insert) {
-            document.getElementById("searchBar").value = insert;
-            filterClimbs();
+        function showHoldsSuggestions() {
+            loadHoldsSuggestions();
+            //document.getElementById('holdsSuggestions').style.display = 'block';
+            //document.getElementById('searchIcon').style.display = 'none';
+            //document.getElementById('searchIcon').style.opacity = '0';
         }
 
         function filterClimbs() {
-            const searchTerm = document.getElementById('searchBar').value.toLowerCase();
+            const searchTerm = document.getElementById('searchBar').value.toLowerCase().trim();
             const climbItems = document.querySelectorAll('.climb-item');
-            const tally = document.getElementById("result-tally");
-            const clearBtn = document.getElementById('clearBtn');
             let visibleCount = 0;
 
-            clearBtn.style.display = searchTerm ? 'flex' : 'none';
-
             climbItems.forEach(item => {
-                // TBD:: split by space; change later for adding by tag??
-                const holds = item.getAttribute('data-holds').split(" ");
+                const holdsData = item.getAttribute('data-holds');
+                let holdsArray = [];
                 
-                if (holds.includes(searchTerm) || searchTerm == "") {
+                try {
+                    holdsArray = JSON.parse(holdsData);
+                } catch (e) {
+                    console.error('Failed to parse holds:', holdsData);
+                    return;
+                }
+                
+                // Check if any hold includes the search term
+                const matches = searchTerm === '' || holdsArray.some(hold => hold.toLowerCase().includes(searchTerm));
+                
+                if (matches) {
                     item.classList.remove('hidden');
                     visibleCount++;
                 } else {
                     item.classList.add('hidden');
                 }
-                
             });
 
-            tally.innerHTML = "";
-
+            // Show/hide no results message
+            const noResultsDiv = document.getElementById('climbList').querySelector('.no-results');
             if (visibleCount === 0 && searchTerm !== '') {
                 const listDiv = document.getElementById('climbList');
                 const existingList = listDiv.querySelector('.climb-list');
                 if (existingList) {
                     existingList.style.display = 'none';
                 }
-                
-                let noResults = listDiv.querySelector('.no-results');
-                if (!noResults) {
-                    noResults = document.createElement('div');
+                if (!noResultsDiv) {
+                    const noResults = document.createElement('div');
                     noResults.className = 'no-results';
+                    noResults.textContent = `No climbs found with "${searchTerm}" holds.`;
                     listDiv.appendChild(noResults);
+                } else {
+                    noResultsDiv.textContent = `No climbs found with "${searchTerm}" holds.`;
+                    noResultsDiv.style.display = 'block';
                 }
-                noResults.textContent = `No climbs found with "${searchTerm}" holds.`;
-                noResults.style.display = 'block';
             } else {
                 const existingList = document.getElementById('climbList').querySelector('.climb-list');
                 if (existingList) {
                     existingList.style.display = 'block';
                 }
-                const noResults = document.getElementById('climbList').querySelector('.no-results');
-                if (noResults) {
-                    noResults.style.display = 'none';
+                if (noResultsDiv) {
+                    noResultsDiv.style.display = 'none';
                 }
-            }
-
-            if (visibleCount > 1 && searchTerm != '') {
-                tally.innerHTML = visibleCount + " routes use \"" + searchTerm + "\"";
-            } else if (visibleCount == 1 && searchTerm != '') {
-                tally.innerHTML = visibleCount + " route uses \"" + searchTerm + "\"";
             }
         }
 
@@ -761,9 +855,12 @@
             document.getElementById('submitBtn').className = 'btn btn-success';
             document.getElementById('editIndex').value = '-1';
             
-            // Reset form and set today's date
             document.getElementById('climbForm').reset();
             document.getElementById('climbDate').valueAsDate = new Date();
+            
+            selectedHolds = []; // Clear selection
+            updateSelectedDisplay();
+            showHoldsPicker(); // Show the holds picker
             
             document.getElementById('climbModal').classList.add('show');
         }
@@ -777,10 +874,14 @@
             
             document.getElementById('editIndex').value = index;
             document.getElementById('climbName').value = climb.name;
-            document.getElementById('climbHolds').value = climb.holds;
             document.getElementById('climbFeet').value = climb.feet;
             document.getElementById('climbDate').value = climb.date;
             document.getElementById('climbDifficulty').value = climb.difficulty;
+            
+            // Load existing holds into selectedHolds
+            selectedHolds = Array.isArray(climb.holds) ? [...climb.holds] : (typeof climb.holds === 'string' ? climb.holds.split(',').map(h => h.trim()) : []);
+            updateSelectedDisplay();
+            showHoldsPicker(); // Show the holds picker
             
             document.getElementById('climbModal').classList.add('show');
         }
@@ -795,36 +896,52 @@
             document.getElementById('clearBtn').style.display = 'none';
         }
 
+        function handleHoldsInput(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const input = document.getElementById('climbHolds');
+                const newHold = input.value.trim().toLowerCase();
+                
+                if (newHold && !selectedHolds.includes(newHold)) {
+                    selectedHolds.push(newHold);
+                    updateSelectedDisplay();
+                    showHoldsPicker();
+                }
+                
+                input.value = '';
+            }
+        }
+
+        function hideHoldsPicker() {
+            setTimeout(() => {
+                document.getElementById('holdsGrid').style.display = 'none';
+            }, 200);
+        }
+
         document.getElementById('climbForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const index = parseInt(document.getElementById('editIndex').value);
             const climbData = {
                 name: document.getElementById('climbName').value,
-                holds: document.getElementById('climbHolds').value,
+                holds: selectedHolds.join(' '), // Use selectedHolds array
                 feet: document.getElementById('climbFeet').value,
                 date: document.getElementById('climbDate').value,
-                difficulty: document.getElementById('climbDifficulty').value
+                difficulty: parseInt(document.getElementById('climbDifficulty').value)
             };
             
             try {
                 let response;
                 if (index === -1) {
-                    // Add new climb
                     response = await fetch('/api/climbs', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(climbData)
                     });
                 } else {
-                    // Update existing climb
                     response = await fetch(`/api/climbs/${index}`, {
                         method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(climbData)
                     });
                 }
@@ -840,6 +957,113 @@
                 console.error('Error:', error);
             }
         });
+
+        let allHoldsMap = {}; // Cache all holds
+
+        function buildHoldsMap() {
+            allHoldsMap = {};
+            
+            allClimbs.forEach(climb => {
+                let holdsArray;
+                if (typeof climb.holds === 'string') {
+                    holdsArray = climb.holds.split(' ').map(h => h.trim().toLowerCase());
+                } else if (Array.isArray(climb.holds)) {
+                    holdsArray = climb.holds;
+                } else {
+                    holdsArray = [];
+                }
+                
+                holdsArray.forEach(hold => {
+                    if (hold) {
+                        allHoldsMap[hold] = (allHoldsMap[hold] || 0) + 1;
+                    }
+                });
+            });
+        }
+
+        function showHoldsPicker() {
+            buildHoldsMap();
+            const sortedHolds = Object.entries(allHoldsMap).sort((a, b) => b[1] - a[1]);
+            
+            let html = '';
+            sortedHolds.forEach(([hold, count]) => {
+                const isSelected = selectedHolds.includes(hold);
+                html += `
+                    <div class="hold-chip ${isSelected ? 'selected' : ''}" onclick="toggleHold('${hold}')">
+                        ${hold} <span class="hold-count">(${count})</span>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('holdsGrid').innerHTML = html;
+            document.getElementById('holdsGrid').style.display = 'flex';
+        }
+
+        function addNewHold() {
+            const input = document.getElementById('newHoldInput');
+            const newHold = input.value.trim().toLowerCase();
+            
+            if (!newHold) {
+                alert('Please enter a hold type');
+                return;
+            }
+            
+            if (selectedHolds.includes(newHold)) {
+                alert('This hold is already selected');
+                return;
+            }
+            
+            // Add to selected holds
+            selectedHolds.push(newHold);
+            updateSelectedDisplay();
+            showHoldsPicker();
+            
+            // Clear input
+            input.value = '';
+            input.focus();
+        }
+
+        // Allow Enter key to add hold
+        document.addEventListener('DOMContentLoaded', function() {
+            const newHoldInput = document.getElementById('newHoldInput');
+            if (newHoldInput) {
+                newHoldInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        addNewHold();
+                    }
+                });
+            }
+        });
+
+        function toggleHold(hold) {
+            const index = selectedHolds.indexOf(hold);
+            if (index > -1) {
+                selectedHolds.splice(index, 1);
+            } else {
+                selectedHolds.push(hold);
+            }
+            updateSelectedDisplay();
+            showHoldsPicker(); // Refresh grid
+        }
+
+        function updateSelectedDisplay() {
+            const container = document.getElementById('selectedHolds');
+            if (selectedHolds.length === 0) {
+                container.innerHTML = '<span class="placeholder">No holds selected</span>';
+                return;
+            }
+            
+            let html = '';
+            selectedHolds.forEach(hold => {
+                html += `
+                    <span class="selected-tag">
+                        ${hold}
+                        <span class="remove-tag" onclick="toggleHold('${hold}')">×</span>
+                    </span>
+                `;
+            });
+            container.innerHTML = html;
+        }
 
         async function deleteClimb(index) {
             if (!confirm(`Are you sure you want to delete "${allClimbs[index].name}"?`)) {
@@ -886,7 +1110,6 @@
             
             // Sort by count
             const sortedHolds = Object.entries(holdsMap).sort((a, b) => b[1] - a[1]);
-            console.log(sortedHolds);
 
             let html = '';
             sortedHolds.forEach(([hold, count]) => {
@@ -913,7 +1136,7 @@
             document.getElementById('modalHoldsSuggestions').innerHTML = html;
         }
 
-        // filter list of suggestion divs based on search input
+        // filter list of suggestion divs based on input
         function filterHoldsSuggestions() {
             const searchValue = document.getElementById("searchBar").value.toLowerCase();
             allSuggestions.forEach(function(item) {
@@ -925,11 +1148,15 @@
             });
 
             document.getElementById('holdsSuggestions').style.display = 'block';
+            document.getElementById('searchIcon').style.display = 'none';
         }
 
         function hideHoldsSuggestions() {
             setTimeout(() => {
                 document.getElementById('holdsSuggestions').style.display = 'none';
+                if (document.getElementById('searchBar').value === '') {
+                    document.getElementById('searchIcon').style.display = 'inline-block';
+                }
             }, 200); // Delay to allow click to register
         }
 
@@ -942,17 +1169,24 @@
 
         function filterModalHoldsSuggestions() {
             const input = document.getElementById('climbHolds').value.toLowerCase();
-            const lastComma = input.lastIndexOf(' ');
-            const searchTerm = lastComma >= 0 ? input.slice(lastComma + 1).trim() : input.trim();
-            allSuggestions.forEach(function(item) {
-                if (item.includes('hold-suggestion-' + searchTerm)) {
-                    document.getElementById('modal-' + item).style.display = 'block';
+            const lastSpace = input.lastIndexOf(' ');
+            const searchTerm = lastSpace >= 0 ? input.slice(lastSpace + 1).trim() : input.trim();
+            
+            // Filter the holdsGrid chips
+            const holdChips = document.querySelectorAll('.hold-chip');
+            holdChips.forEach(chip => {
+                const holdName = chip.textContent.toLowerCase();
+                if (holdName.includes(searchTerm) || searchTerm === '') {
+                    chip.style.display = 'block';
                 } else {
-                    document.getElementById('modal-' + item).style.display = 'none';
+                    chip.style.display = 'none';
                 }
             });
-
-            document.getElementById('modalHoldsSuggestions').style.display = 'block';
+            
+            // Show the grid when typing
+            if (searchTerm !== '' || input !== '') {
+                document.getElementById('holdsGrid').style.display = 'flex';
+            }
         }
 
         function hideModalHoldsSuggestions() {
