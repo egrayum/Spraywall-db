@@ -200,9 +200,10 @@
             });
             const tally = $('#result-tally'); tally.textContent='';
             if(visible===0 && (selectedSearchHolds.length>0 || inputVal)){
-                $('#climbList').querySelector('.climb-list')?.style.display='none';
+                const existingList = $('#climbList').querySelector('.climb-list');
+                if (existingList) existingList.style.display = 'none';
                 let nr = $('#climbList').querySelector('.no-results'); if(!nr){ nr=document.createElement('div'); nr.className='no-results'; $('#climbList').appendChild(nr);} nr.textContent = `No climbs found with "${selectedSearchHolds.join(', ') || inputVal}" holds.`; nr.style.display='block';
-            }else{ $('#climbList').querySelector('.climb-list')?.style.display='block'; $('#climbList').querySelector('.no-results')?.remove(); }
+            }else{ const existingList = $('#climbList').querySelector('.climb-list'); if (existingList) existingList.style.display = 'block'; const nr = $('#climbList').querySelector('.no-results'); if (nr) nr.remove(); }
             if(selectedSearchHolds.length>0) tally.textContent = `${Array.from($$('.climb-item')).filter(i=>!i.classList.contains('hidden')).length} routes use "${selectedSearchHolds.join(', ')}"`;
             $('#clearBtn').style.display = (selectedSearchHolds.length || inputVal) ? 'inline-block' : 'none';
         }
