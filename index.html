@@ -4,569 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Climbing Log</title>
-    
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        h1 {
-            color:#333;
-            font: arial;
-        }
-        .header-button {
-            width: 100%;
-            background: linear-gradient(90deg, #3498db 50%, #e74c3c 50%);
-            border: none;
-            padding: 20px;
-            cursor: pointer;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            position: relative;
-            overflow: hidden;
-        }
-        .header-text {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header-left, .header-right {
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-            flex: 1;
-            text-align: center;
-        }
-        .header-left {
-            opacity: 1;
-        }
-        .header-right {
-            opacity: 0.5;
-        }
-        .header-button.flipped .header-left {
-            opacity: 0.5;
-        }
-        .header-button.flipped .header-right {
-            opacity: 1;
-        }
-        .search-container {
-            margin-bottom: 25px;
-        }
-        .search-bar {
-            width: 100%;
-            padding: 12px 20px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            margin-bottom: 10px;
-        }
-        .search-bar:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-        .add-btn {
-            width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-            background-color: #2ecc71;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .add-btn:hover {
-            background-color: #27ae60;
-        }
-        .climb-list, .holds-list {
-            list-style: none;
-            padding: 0;
-        }
-        .climb-item, .hold-item {
-            background: white;
-            padding: 20px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        .climb-item.hidden, .hold-item.hidden {
-            display: none;
-        }
-        .climb-name {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        .hold-name {
-            font-size: 20px;
-            font-weight: bold;
-            color: #e74c3c;
-            margin-bottom: 10px;
-        }
-        .climb-details, .hold-details {
-            color: #666;
-            font-size: 14px;
-        }
-        .difficulty {
-            display: inline-block;
-            background: #3498db;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-top: 8px;
-        }
-        .count-badge {
-            display: inline-block;
-            background: #e74c3c;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-top: 8px;
-        }
-        .edit-btn, .delete-btn {
-            background: #95a5a6;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 8px;
-            margin-top: 8px;
-        }
-        .edit-btn:hover {
-            background: #7f8c8d;
-        }
-        .delete-btn {
-            background: #e74c3c;
-        }
-        .delete-btn:hover {
-            background: #c0392b;
-        }
-        .no-results {
-            text-align: center;
-            color: #999;
-            padding: 40px;
-            background: white;
-            border-radius: 8px;
-        }
-        .view-climbs, .view-holds {
-            display: block;
-        }
-        .view-climbs.hidden, .view-holds.hidden {
-            display: none;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal.show {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .modal-header {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-primary {
-            background: #3498db;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #2980b9;
-        }
-        .btn-success {
-            background: #2ecc71;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #27ae60;
-        }
-        .btn-cancel {
-            background: #95a5a6;
-            color: white;
-        }
-        .btn-cancel:hover {
-            background: #7f8c8d;
-        }body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .header-button {
-            width: 100%;
-            background: linear-gradient(90deg, #3498db 50%, #e74c3c 50%);
-            border: none;
-            padding: 20px;
-            cursor: pointer;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            position: relative;
-            overflow: hidden;
-        }
-        .header-text {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header-left, .header-right {
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-            flex: 1;
-            text-align: center;
-        }
-        .header-left {
-            opacity: 1;
-        }
-        .header-right {
-            opacity: 0.5;
-        }
-        .header-button.flipped .header-left {
-            opacity: 0.5;
-        }
-        .header-button.flipped .header-right {
-            opacity: 1;
-        }
-        .search-container {
-            margin-bottom: 25px;
-        }
-        .search-bar {
-            width: 100%;
-            padding: 12px 20px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            margin-bottom: 10px;
-        }
-        .search-bar:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-        .add-btn {
-            width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-            background-color: #2ecc71;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .add-btn:hover {
-            background-color: #27ae60;
-        }
-        .climb-list {
-            list-style: none;
-            padding: 0;
-        }
-        .climb-item {
-            background: white;
-            padding: 20px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative;
-
-        }
-        .climb-item.hidden {
-            display: none;
-        }
-        .climb-name {
-            text-align: left;
-            font-size: 22px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        .climb-details {
-            margin: 0;
-            text-align: left;
-            color: #666;
-            font-size: 18px;
-            width: 75%;
-        }
-        .difficulty {
-            display: inline-block;
-            background: #3498db;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-top: 8px;
-        }
-        .climb-actions {
-            position: absolute;
-            top: 0;
-            right: 0;
-            margin: 0;
-            display: inline-block;
-            text-align: right;
-            width: fit-content;
-        }
-        .edit-btn, .delete-btn {
-            background: #95a5a6;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 8px;
-            margin-top: 8px;
-            display: block;
-        }
-        .edit-btn:hover {
-            background: #7f8c8d;
-        }
-        .delete-btn {
-            background: #e74c3c;
-        }
-        .delete-btn:hover {
-            background: #c0392b;
-        }
-        .loading {
-            text-align: center;
-            color: #666;
-        }
-        .no-results {
-            text-align: center;
-            color: #999;
-            padding: 40px;
-            background: white;
-            border-radius: 8px;
-        }
-        .view-climbs, .view-holds {
-            display: block;
-        }
-        .view-climbs.hidden, .view-holds.hidden {
-            display: none;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal.show {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .modal-header {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-primary {
-            background: #3498db;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #2980b9;
-        }
-        .btn-success {
-            background: #2ecc71;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #27ae60;
-        }
-        .btn-cancel {
-            background: #95a5a6;
-            color: white;
-        }
-        .btn-cancel:hover {
-            background: #7f8c8d;
-        }
-        .status {
-            color: #666;
-            font: 18px arial;
-        }
-        .inline-button {
-            font: 18px arial;
-            color:#27ae60;
-            margin: -2px;
-            border: 0;
-            background: rgba(0,0,0,0);
-        }
-        .clear-btn {
-            position: absolute;
-            right: 10px;
-            top: 15%;
-            background: rgba(0,0,0,0);
-            color: #666;
-            border: none;
-            border-radius: 4px;
-            width: 30px;
-            height: 30px;
-            font-size: 26px;
-            line-height: 1;
-            cursor: pointer;
-            padding: 0 0 4px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .clear-btn:hover {
-            background: #ccc;
-        }
-        .holds-suggestions {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 2px solid #ddd;
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 100;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .hold-suggestion {
-            padding: 10px 15px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .hold-suggestion:hover {
-            background: #f8f9fa;
-        }
-        .hold-suggestion:last-child {
-            border-bottom: none;
-        }
-        .suggestion-name {
-            font-weight: 500;
-            color: #2c3e50;
-        }
-        .suggestion-count {
-            font-size: 12px;
-            color: #7f8c8d;
-        }
+        /* condensed/updated styles + tag styles */
+        body { font-family: Arial, sans-serif; max-width:800px; margin:50px auto; padding:20px; background:#f5f5f5; }
+        h1 { color:#333; margin:0 0 18px 0 }
+        .search-container { margin-bottom:20px; }
+        .search-wrapper { position:relative; border:2px solid #ddd; border-radius:8px; padding:6px 10px; background:white; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+        .tag { display:inline-flex; align-items:center; gap:8px; background:#ecf0f1; padding:6px 8px; border-radius:999px; font-size:13px; }
+        .tag .remove { cursor:pointer; font-weight:700; padding-left:6px; }
+        .tag.primary { background:#3498db; color:white }
+        .tag-input { border:none; outline:none; min-width:120px; font-size:15px; padding:6px; background:transparent }
+        .clear-btn { background:transparent; border:none; font-size:20px; cursor:pointer; }
+        .add-btn { margin-top:8px; padding:10px 14px; font-weight:700; border-radius:8px; border:none; background:#2ecc71; color:white; cursor:pointer }
+        .holds-suggestions { position:absolute; top:100%; left:0; right:0; background:white; border:2px solid #ddd; border-top:none; border-radius:0 0 8px 8px; max-height:200px; overflow:auto; z-index:100 }
+        .hold-suggestion { padding:10px 14px; display:flex; justify-content:space-between; gap:12px; cursor:pointer; border-bottom:1px solid #f0f0f0 }
+        .hold-suggestion:hover { background:#f8f9fa }
+        .climb-list{list-style:none;padding:0;margin:0}
+        .climb-item{background:white;padding:16px;border-radius:8px;margin-bottom:12px;box-shadow:0 2px 4px rgba(0,0,0,0.06);position:relative}
+        .climb-name{font-weight:700;margin-bottom:8px}
+        .climb-actions{position:absolute;right:10px;top:10px;display:flex;gap:8px}
+        .edit-btn,.delete-btn{border:none;padding:6px 10px;border-radius:6px;cursor:pointer;color:white}
+        .edit-btn{background:#95a5a6} .delete-btn{background:#e74c3c}
+        .modal{display:none;position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center}
+        .modal.show{display:flex}
+        .modal-content{background:white;padding:20px;border-radius:8px;width:92%;max-width:540px;max-height:90vh;overflow:auto}
+        .form-group{margin-bottom:12px}
+        .form-group input, .form-group select{width:100%;padding:10px;border:2px solid #ddd;border-radius:6px}
+        .selected-placeholder{color:#999;font-style:italic;padding:6px}
     </style>
 </head>
 <body>
     <h1>Spraywall Database</h1>
+
     <div class="search-container">
-        <div style="position: relative;">
-            <input 
-                type="text" 
-                id="searchBar" 
-                class="search-bar" 
-                autocomplete="off"
-                placeholder="Search by hold name"
-                onkeyup="filterClimbs(), filterHoldsSuggestions()"
-                onfocus="filterHoldsSuggestions()"
-                onblur="hideHoldsSuggestions()"
-            >
-            <button id="clearBtn" class="clear-btn" onclick="clearSearch()" style="display: none;">×</button>
-            <div id="holdsSuggestions" class="holds-suggestions" style="display: none;"></div>
+        <div class="search-wrapper" id="searchWrapper">
+            <div id="searchTags" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"></div>
+            <input id="searchInput" class="tag-input" placeholder="Type hold name and press Enter or choose suggestion" autocomplete="off">
+            <button id="clearBtn" class="clear-btn" style="display:none">×</button>
+            <div id="holdsSuggestions" class="holds-suggestions" style="display:none"></div>
         </div>
         <button class="add-btn" onclick="openAddModal()">+ Add New Climb</button>
     </div>
+
     <p id="result-tally" class="status"></p>
     <div id="climbList" class="loading">Loading climbs...</div>
 
@@ -576,38 +55,28 @@
             <div id="modalTitle" class="modal-header">Add New Climb</div>
             <form id="climbForm">
                 <input type="hidden" id="editIndex" value="-1">
-                
                 <div class="form-group">
                     <label for="climbName">Name</label>
                     <input type="text" id="climbName">
                 </div>
-                
                 <div class="form-group">
                     <label for="climbHolds">Holds *</label>
-                    <div style="position: relative;">
-                        <input 
-                            type="text" 
-                            id="climbHolds" 
-                            required
-                            autocomplete="off"
-                            onfocus="filterModalHoldsSuggestions()"
-                            onblur="hideModalHoldsSuggestions()"
-                            oninput="filterModalHoldsSuggestions()"
-                        >
-                        <div id="modalHoldsSuggestions" class="holds-suggestions" style="display: none;"></div>
+                    <div style="position:relative">
+                        <div class="search-wrapper" id="modalSearchWrapper">
+                            <div id="modalTags" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"></div>
+                            <input id="modalInput" class="tag-input" placeholder="Type hold name and press Enter or choose suggestion" autocomplete="off">
+                            <div id="modalHoldsSuggestions" class="holds-suggestions" style="display:none"></div>
+                        </div>
                     </div>
                 </div>
-                
                 <div class="form-group">
                     <label for="climbFeet">Feet</label>
                     <input type="text" id="climbFeet">
                 </div>
-                
                 <div class="form-group">
                     <label for="climbDate">Date</label>
                     <input type="date" id="climbDate">
                 </div>
-                
                 <div class="form-group">
                     <label for="climbDifficulty">Difficulty</label>
                     <select id="climbDifficulty">
@@ -618,7 +87,6 @@
                         <option>10+</option>
                     </select>
                 </div>
-                
                 <div class="modal-buttons">
                     <button type="button" class="btn btn-cancel" onclick="closeModal()">Cancel</button>
                     <button type="submit" id="submitBtn" class="btn btn-success">Add Climb</button>
@@ -628,364 +96,179 @@
     </div>
 
     <script>
+        // Data
         let allClimbs = [];
-        let currentView = 'climbs';
-        let allSuggestions = new Set([]);
+        let holdsMap = {}; // hold -> count
+        let selectedSearchHolds = []; // tags in search bar
+        let selectedModalHolds = []; // tags in modal
 
-        async function loadClimbs() {
-            try {
-                const response = await fetch('/api/climbs');
-                allClimbs = await response.json();
-                
-                displayClimbs(allClimbs);
-                loadHoldsSuggestions();
-                
-            } catch (error) {
-                document.getElementById('climbList').innerHTML = 
-                    '<p>Error loading climbs. Make sure the server is running.</p>';
-                console.error('Error:', error);
+        // Helpers
+        const $ = (s, ctx=document) => ctx.querySelector(s);
+        const $$ = (s, ctx=document) => Array.from(ctx.querySelectorAll(s));
+
+        async function loadClimbs(){
+            try{
+                const res = await fetch('/api/climbs');
+                allClimbs = await res.json();
+                rebuildHoldsMap();
+                renderSuggestions();
+                renderClimbs(allClimbs);
+            }catch(e){
+                $('#climbList').innerHTML = '<p>Error loading climbs. Make sure the server is running.</p>';
+                console.error(e);
             }
         }
 
-        function displayClimbs(climbs) {
-            const listDiv = document.getElementById('climbList');
-            
-            if (climbs.length === 0) {
-                listDiv.innerHTML = '<div class="no-results">No climbs found.</div>';
-                return;
-            }
-            
-            let html = '<ul class="climb-list">';
-            
-            climbs.forEach((climb, index) => {
-                if (!climb.name) { climb.name = climb.holds.split(" ")[0] + " " + climb.holds.split(" ")[1]; }
-                if (climb.feet) { climb.feet = `<strong>Feet:</strong> ${climb.feet}<br>`;}
-                if (climb.date) { climb.date =` <strong>Date:</strong> ${climb.date}<br>`; }
-                if (!climb.difficulty) { climb.difficulty = "fun"; }
-                climb.holds;
-                var hold_links = ""
-                const split_holds = climb.holds.split(" ")
-                
-                split_holds.forEach((hold, i) => {
-                    var oawiehjfclaif = split_holds[i];
-                    if (split_holds[i] != "") {
-                        hold_links += `<button class="inline-button" onclick="fillSearch('${split_holds[i]}')">${split_holds[i]}</button>`;
-                    }
-                });
-                html += `
-                    <li class="climb-item" data-index="${index}" data-holds="${climb.holds.toLowerCase()}">
-                        <div class="climb-details">
-                            <div class="climb-name">${climb.name}</div>
-                            <strong>Holds:</strong> ${hold_links}<br>
-                            ${climb.feet}
-                            ${climb.date}
-                            <block class="difficulty">V${climb.difficulty}</block>
-                        </div>
-                        <div class="climb-actions">
-                            <button class="edit-btn" onclick="openEditModal(${index})">Edit</button>
-                            <button class="delete-btn" onclick="deleteClimb(${index})">Delete</button>
-                        </div>
-                    </li>
-                `;
+        function rebuildHoldsMap(){
+            holdsMap = {};
+            allClimbs.forEach(c => {
+                let arr = [];
+                if(Array.isArray(c.holds)) arr = c.holds.map(h=>String(h).toLowerCase());
+                else if(typeof c.holds === 'string') arr = c.holds.split(/[ ,]+/).map(h=>h.trim().toLowerCase()).filter(Boolean);
+                arr.forEach(h=>{ holdsMap[h] = (holdsMap[h]||0)+1 });
             });
-            
-            html += '</ul>';
-            listDiv.innerHTML = html;
         }
 
-        function fillSearch(insert) {
-            document.getElementById("searchBar").value = insert;
+        function renderSuggestions(){
+            const sorted = Object.entries(holdsMap).sort((a,b)=>b[1]-a[1]);
+            const html = sorted.map(([h,count]) => `<div class="hold-suggestion" data-hold="${h}"><span class="suggestion-name">${h}</span><span class="suggestion-count">${count}</span></div>`).join('');
+            $('#holdsSuggestions').innerHTML = html;
+            $('#modalHoldsSuggestions').innerHTML = html;
+            // attach listeners
+            $$('#holdsSuggestions .hold-suggestion').forEach(el=>el.addEventListener('mousedown', (ev)=>{ addSearchTag(el.dataset.hold); ev.preventDefault(); }));
+            $$('#modalHoldsSuggestions .hold-suggestion').forEach(el=>el.addEventListener('mousedown', (ev)=>{ addModalTag(el.dataset.hold); ev.preventDefault(); }));
+        }
+
+        function renderClimbs(climbs){
+            const list = $('#climbList');
+            if(!climbs || climbs.length===0){ list.innerHTML = '<div class="no-results">No climbs found.</div>'; return }
+            const ul = document.createElement('ul'); ul.className='climb-list';
+            climbs.forEach((c,i)=>{
+                const li = document.createElement('li'); li.className='climb-item';
+                const holdsText = (Array.isArray(c.holds)?c.holds.join(' '):String(c.holds||'')).toLowerCase();
+                li.dataset.holds = holdsText;
+                li.innerHTML = `<div class="climb-details"><div class="climb-name">${c.name||''}</div><div><strong>Holds:</strong> ${formatHoldsInline(c.holds)}</div><div>${c.feet?'<strong>Feet:</strong> '+c.feet+'<br/>':''}${c.date?'<strong>Date:</strong> '+c.date+'<br/>':''}<div class="difficulty">V${c.difficulty||''}</div></div>`;
+                const actions = document.createElement('div'); actions.className='climb-actions';
+                const ebtn=document.createElement('button'); ebtn.className='edit-btn'; ebtn.textContent='Edit'; ebtn.addEventListener('click', ()=> openEditModal(i));
+                const dbtn=document.createElement('button'); dbtn.className='delete-btn'; dbtn.textContent='Delete'; dbtn.addEventListener('click', ()=> deleteClimb(i));
+                actions.appendChild(ebtn); actions.appendChild(dbtn); li.appendChild(actions);
+                ul.appendChild(li);
+            });
+            list.innerHTML=''; list.appendChild(ul);
+        }
+
+        function formatHoldsInline(holds){
+            let arr = [];
+            if(Array.isArray(holds)) arr = holds;
+            else if(typeof holds==='string') arr = holds.split(/[ ,]+/).filter(Boolean);
+            return arr.map(h=>`<span class="tag">${h}</span>`).join(' ');
+        }
+
+        // Tag management - search
+        function addSearchTag(tag){
+            tag = String(tag).toLowerCase();
+            if(!tag) return;
+            if(!selectedSearchHolds.includes(tag)) selectedSearchHolds.push(tag);
+            renderSearchTags();
             filterClimbs();
+            $('#searchInput').value='';
+            $('#holdsSuggestions').style.display='none';
+            $('#clearBtn').style.display = selectedSearchHolds.length ? 'inline-block' : 'none';
+        }
+        function removeSearchTag(tag){ selectedSearchHolds = selectedSearchHolds.filter(t=>t!==tag); renderSearchTags(); filterClimbs(); }
+        function renderSearchTags(){ const container = $('#searchTags'); container.innerHTML=''; if(selectedSearchHolds.length===0){ const ph=document.createElement('div'); ph.className='selected-placeholder'; ph.textContent='Type hold name and press Enter or choose suggestion'; container.appendChild(ph); return }
+            selectedSearchHolds.forEach(t=>{ const sp=document.createElement('span'); sp.className='tag primary'; sp.textContent=t; const rem=document.createElement('span'); rem.className='remove'; rem.textContent='×'; rem.addEventListener('click', ()=>removeSearchTag(t)); sp.appendChild(rem); container.appendChild(sp); }); }
+
+        // Tag management - modal
+        function addModalTag(tag){ tag=String(tag).toLowerCase(); if(!tag) return; if(!selectedModalHolds.includes(tag)) selectedModalHolds.push(tag); renderModalTags(); $('#modalInput').value=''; $('#modalHoldsSuggestions').style.display='none'; }
+        function removeModalTag(tag){ selectedModalHolds = selectedModalHolds.filter(t=>t!==tag); renderModalTags(); }
+        function renderModalTags(){ const c=$('#modalTags'); c.innerHTML=''; if(selectedModalHolds.length===0){ const ph=document.createElement('div'); ph.className='selected-placeholder'; ph.textContent='No holds selected'; c.appendChild(ph); return } selectedModalHolds.forEach(t=>{ const sp=document.createElement('span'); sp.className='tag'; sp.textContent=t; const rem=document.createElement('span'); rem.className='remove'; rem.textContent='×'; rem.addEventListener('click', ()=>removeModalTag(t)); sp.appendChild(rem); c.appendChild(sp); }); }
+
+        // Filtering
+        function filterClimbs(){
+            const inputVal = $('#searchInput').value.toLowerCase().trim();
+            const items = $$('.climb-item');
+            let visible=0;
+            items.forEach(it=>{
+                const holds = it.dataset.holds || '';
+                // if tags present, require ALL tags to be present
+                let pass = true;
+                if(selectedSearchHolds.length>0){
+                    for(const t of selectedSearchHolds){ if(!holds.includes(t)) { pass=false; break } }
+                } else if(inputVal){ pass = holds.includes(inputVal); }
+                if(pass){ it.classList.remove('hidden'); visible++ } else it.classList.add('hidden');
+            });
+            const tally = $('#result-tally'); tally.textContent='';
+            if(visible===0 && (selectedSearchHolds.length>0 || inputVal)){
+                $('#climbList').querySelector('.climb-list')?.style.display='none';
+                let nr = $('#climbList').querySelector('.no-results'); if(!nr){ nr=document.createElement('div'); nr.className='no-results'; $('#climbList').appendChild(nr);} nr.textContent = `No climbs found with "${selectedSearchHolds.join(', ') || inputVal}" holds.`; nr.style.display='block';
+            }else{ $('#climbList').querySelector('.climb-list')?.style.display='block'; $('#climbList').querySelector('.no-results')?.remove(); }
+            if(selectedSearchHolds.length>0) tally.textContent = `${Array.from($$('.climb-item')).filter(i=>!i.classList.contains('hidden')).length} routes use "${selectedSearchHolds.join(', ')}"`;
+            $('#clearBtn').style.display = (selectedSearchHolds.length || inputVal) ? 'inline-block' : 'none';
         }
 
-        function filterClimbs() {
-            const searchTerm = document.getElementById('searchBar').value.toLowerCase();
-            const climbItems = document.querySelectorAll('.climb-item');
-            const tally = document.getElementById("result-tally");
-            const clearBtn = document.getElementById('clearBtn');
-            let visibleCount = 0;
+        // Suggestions filtering
+        function filterHoldsSuggestions(){
+            const qv = $('#searchInput').value.toLowerCase();
+            const suggestions = $$('#holdsSuggestions .hold-suggestion');
+            suggestions.forEach(s=>{ const h=s.dataset.hold; s.style.display = (!qv || h.includes(qv)) ? 'flex' : 'none'; });
+            $('#holdsSuggestions').style.display = suggestions.some(s=>s.style.display!=='none') ? 'block' : 'none';
+        }
+        function filterModalHoldsSuggestions(){ const qv = $('#modalInput').value.toLowerCase(); const suggestions = $$('#modalHoldsSuggestions .hold-suggestion'); suggestions.forEach(s=>{ const h=s.dataset.hold; s.style.display = (!qv || h.includes(qv)) ? 'flex' : 'none'; }); $('#modalHoldsSuggestions').style.display = suggestions.some(s=>s.style.display!=='none') ? 'block' : 'none'; }
 
-            clearBtn.style.display = searchTerm ? 'flex' : 'none';
+        // Select from suggestion (modal vs search handled by attached listeners in renderSuggestions)
 
-            climbItems.forEach(item => {
-                // TBD:: split by space; change later for adding by tag??
-                const holds = item.getAttribute('data-holds').split(" ");
-                
-                if (holds.includes(searchTerm) || searchTerm == "") {
-                    item.classList.remove('hidden');
-                    visibleCount++;
-                } else {
-                    item.classList.add('hidden');
-                }
-                
+        // Input handlers
+        document.addEventListener('DOMContentLoaded', ()=>{
+            // search input
+            const sInput = $('#searchInput');
+            sInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); const v=sInput.value.trim().toLowerCase(); if(v) addSearchTag(v); } });
+            sInput.addEventListener('input', ()=> filterHoldsSuggestions());
+            sInput.addEventListener('focus', ()=> { renderSuggestions(); filterHoldsSuggestions(); });
+            sInput.addEventListener('blur', ()=> setTimeout(()=>$('#holdsSuggestions').style.display='none',150));
+
+            $('#clearBtn').addEventListener('click', ()=>{ selectedSearchHolds=[]; $('#searchInput').value=''; renderSearchTags(); filterClimbs(); $('#clearBtn').style.display='none'; });
+
+            // modal input
+            const mInput = $('#modalInput');
+            mInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); const v=mInput.value.trim().toLowerCase(); if(v) addModalTag(v); } });
+            mInput.addEventListener('input', ()=> filterModalHoldsSuggestions());
+            mInput.addEventListener('focus', ()=> { renderSuggestions(); filterModalHoldsSuggestions(); });
+            mInput.addEventListener('blur', ()=> setTimeout(()=>$('#modalHoldsSuggestions').style.display='none',150));
+
+            // form submit wiring
+            const form = $('#climbForm'); form.addEventListener('submit', async (e)=>{
+                e.preventDefault();
+                const index = parseInt($('#editIndex').value,10);
+                const climbData = {
+                    name: $('#climbName').value,
+                    holds: selectedModalHolds.join(' '),
+                    feet: $('#climbFeet').value,
+                    date: $('#climbDate').value,
+                    difficulty: $('#climbDifficulty').value
+                };
+                try{
+                    let res;
+                    if(index===-1){ res = await fetch('/api/climbs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(climbData)});
+                    }else{ res = await fetch(`/api/climbs/${index}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(climbData)}); }
+                    if(res.ok){ closeModal(); await loadClimbs(); } else alert('Error saving climb');
+                }catch(err){ alert('Error saving climb'); console.error(err); }
             });
 
-            tally.innerHTML = "";
+            // click outside modal closes
+            $('#climbModal').addEventListener('click', (e)=>{ if(e.target.id==='climbModal') closeModal(); });
 
-            if (visibleCount === 0 && searchTerm !== '') {
-                const listDiv = document.getElementById('climbList');
-                const existingList = listDiv.querySelector('.climb-list');
-                if (existingList) {
-                    existingList.style.display = 'none';
-                }
-                
-                let noResults = listDiv.querySelector('.no-results');
-                if (!noResults) {
-                    noResults = document.createElement('div');
-                    noResults.className = 'no-results';
-                    listDiv.appendChild(noResults);
-                }
-                noResults.textContent = `No climbs found with "${searchTerm}" holds.`;
-                noResults.style.display = 'block';
-            } else {
-                const existingList = document.getElementById('climbList').querySelector('.climb-list');
-                if (existingList) {
-                    existingList.style.display = 'block';
-                }
-                const noResults = document.getElementById('climbList').querySelector('.no-results');
-                if (noResults) {
-                    noResults.style.display = 'none';
-                }
-            }
-
-            if (visibleCount > 1 && searchTerm != '') {
-                tally.innerHTML = visibleCount + " routes use \"" + searchTerm + "\"";
-            } else if (visibleCount == 1 && searchTerm != '') {
-                tally.innerHTML = visibleCount + " route uses \"" + searchTerm + "\"";
-            }
-        }
-
-        function openAddModal() {
-            document.getElementById('modalTitle').textContent = 'Add New Climb';
-            document.getElementById('submitBtn').textContent = 'Add Climb';
-            document.getElementById('submitBtn').className = 'btn btn-success';
-            document.getElementById('editIndex').value = '-1';
-            
-            // Reset form and set today's date
-            document.getElementById('climbForm').reset();
-            document.getElementById('climbDate').valueAsDate = new Date();
-            
-            document.getElementById('climbModal').classList.add('show');
-        }
-
-        function openEditModal(index) {
-            const climb = allClimbs[index];
-            
-            document.getElementById('modalTitle').textContent = 'Edit Climb';
-            document.getElementById('submitBtn').textContent = 'Save Changes';
-            document.getElementById('submitBtn').className = 'btn btn-primary';
-            
-            document.getElementById('editIndex').value = index;
-            document.getElementById('climbName').value = climb.name;
-            document.getElementById('climbHolds').value = climb.holds;
-            document.getElementById('climbFeet').value = climb.feet;
-            document.getElementById('climbDate').value = climb.date;
-            document.getElementById('climbDifficulty').value = climb.difficulty;
-            
-            document.getElementById('climbModal').classList.add('show');
-        }
-
-        function closeModal() {
-            document.getElementById('climbModal').classList.remove('show');
-        }
-
-        function clearSearch() {
-            document.getElementById('searchBar').value = '';
-            filterClimbs();
-            document.getElementById('clearBtn').style.display = 'none';
-        }
-
-        document.getElementById('climbForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const index = parseInt(document.getElementById('editIndex').value);
-            const climbData = {
-                name: document.getElementById('climbName').value,
-                holds: document.getElementById('climbHolds').value,
-                feet: document.getElementById('climbFeet').value,
-                date: document.getElementById('climbDate').value,
-                difficulty: document.getElementById('climbDifficulty').value
-            };
-            
-            try {
-                let response;
-                if (index === -1) {
-                    // Add new climb
-                    response = await fetch('/api/climbs', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(climbData)
-                    });
-                } else {
-                    // Update existing climb
-                    response = await fetch(`/api/climbs/${index}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(climbData)
-                    });
-                }
-                
-                if (response.ok) {
-                    closeModal();
-                    await loadClimbs();
-                } else {
-                    alert('Error saving climb');
-                }
-            } catch (error) {
-                alert('Error saving climb');
-                console.error('Error:', error);
-            }
+            // initial renders
+            renderSearchTags(); renderModalTags(); loadClimbs();
         });
 
-        async function deleteClimb(index) {
-            if (!confirm(`Are you sure you want to delete "${allClimbs[index].name}"?`)) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/api/climbs/${index}`, {
-                    method: 'DELETE'
-                });
-                
-                if (response.ok) {
-                    await loadClimbs();
-                } else {
-                    alert('Error deleting climb');
-                }
-            } catch (error) {
-                alert('Error deleting climb');
-                console.error('Error:', error);
-            }
-        }
+        // Edit modal
+        function openAddModal(){ $('#modalTitle').textContent='Add New Climb'; $('#submitBtn').textContent='Add Climb'; $('#editIndex').value='-1'; $('#climbForm').reset(); selectedModalHolds=[]; renderModalTags(); $('#climbDate').valueAsDate = new Date(); $('#climbModal').classList.add('show'); }
+        function openEditModal(index){ const c = allClimbs[index]; $('#modalTitle').textContent='Edit Climb'; $('#submitBtn').textContent='Save Changes'; $('#editIndex').value=index; $('#climbName').value=c.name||''; selectedModalHolds = (typeof c.holds==='string')? c.holds.split(/[ ,]+/).filter(Boolean).map(h=>h.toLowerCase()) : (Array.isArray(c.holds)? c.holds.map(h=>String(h).toLowerCase()):[]); renderModalTags(); $('#climbFeet').value=c.feet||''; $('#climbDate').value=c.date||''; $('#climbDifficulty').value=c.difficulty||''; $('#climbModal').classList.add('show'); }
+        function closeModal(){ $('#climbModal').classList.remove('show'); }
 
-        function loadHoldsSuggestions() {
-            const holdsMap = {};
-            
-            // Gather all unique holds from the holds attribute
-            allClimbs.forEach(climb => {
-                // Parse the holds from data attribute or directly from climb object
-                let holdsArray;
-                if (typeof climb.holds === 'string') {
-                    holdsArray = climb.holds.split(' ').map(h => h.trim().toLowerCase());
-                } else if (Array.isArray(climb.holds)) {
-                    holdsArray = climb.holds;
-                } else {
-                    holdsArray = [];
-                }
-                
-                holdsArray.forEach(hold => {
-                    if (hold) {
-                        holdsMap[hold] = (holdsMap[hold] || 0) + 1;
-                    }
-                });
-            });
-            
-            // Sort by count
-            const sortedHolds = Object.entries(holdsMap).sort((a, b) => b[1] - a[1]);
-            console.log(sortedHolds);
+        async function deleteClimb(index){ if(!confirm(`Are you sure you want to delete "${allClimbs[index].name}"?`)) return; try{ const res = await fetch(`/api/climbs/${index}`,{method:'DELETE'}); if(res.ok) await loadClimbs(); else alert('Error deleting climb'); }catch(e){ alert('Error deleting climb'); console.error(e); } }
 
-            let html = '';
-            sortedHolds.forEach(([hold, count]) => {
-                allSuggestions.add('hold-suggestion-' + hold);
-                html += `
-                    <div class="hold-suggestion" id="${('hold-suggestion-' + hold)}" onmousedown="selectHold('${hold}')">
-                        <span class="suggestion-name">${hold}</span>
-                        <span class="suggestion-count">${count} climb${count > 1 ? 's' : ''}</span>
-                    </div>
-                `;
-            });
-
-            document.getElementById('holdsSuggestions').innerHTML = html;
-
-            html = '';
-            sortedHolds.forEach(([hold, count]) => {
-                html += `
-                    <div class="hold-suggestion" id="${('modal-hold-suggestion-' + hold)}" onmousedown="selectModalHold('${hold}')">
-                        <span class="suggestion-name">${hold}</span>
-                        <span class="suggestion-count">${count} climb${count > 1 ? 's' : ''}</span>
-                    </div>
-                `;
-            });
-            document.getElementById('modalHoldsSuggestions').innerHTML = html;
-        }
-
-        // filter list of suggestion divs based on search input
-        function filterHoldsSuggestions() {
-            const searchValue = document.getElementById("searchBar").value.toLowerCase();
-            allSuggestions.forEach(function(item) {
-                if (item.includes('hold-suggestion-' + searchValue)) {
-                    document.getElementById(item).style.display = 'block';
-                } else {
-                    document.getElementById(item).style.display = 'none';
-                }
-            });
-
-            document.getElementById('holdsSuggestions').style.display = 'block';
-        }
-
-        function hideHoldsSuggestions() {
-            setTimeout(() => {
-                document.getElementById('holdsSuggestions').style.display = 'none';
-            }, 200); // Delay to allow click to register
-        }
-
-        function selectHold(hold) {
-            document.getElementById('searchBar').value = hold;
-            filterClimbs();
-            document.getElementById('holdsSuggestions').style.display = 'none';
-        }
-
-
-        function filterModalHoldsSuggestions() {
-            const input = document.getElementById('climbHolds').value.toLowerCase();
-            const lastComma = input.lastIndexOf(' ');
-            const searchTerm = lastComma >= 0 ? input.slice(lastComma + 1).trim() : input.trim();
-            allSuggestions.forEach(function(item) {
-                if (item.includes('hold-suggestion-' + searchTerm)) {
-                    document.getElementById('modal-' + item).style.display = 'block';
-                } else {
-                    document.getElementById('modal-' + item).style.display = 'none';
-                }
-            });
-
-            document.getElementById('modalHoldsSuggestions').style.display = 'block';
-        }
-
-        function hideModalHoldsSuggestions() {
-            setTimeout(() => {
-                document.getElementById('modalHoldsSuggestions').style.display = 'none';
-            }, 200);
-        }
-
-        function selectModalHold(hold) {
-            const input = document.getElementById('climbHolds');
-            const currentValue = input.value;
-            const lastComma = currentValue.lastIndexOf(' ');
-            
-            if (lastComma >= 0) {
-                // Replace the last tag after the comma
-                input.value = currentValue.slice(0, lastComma + 1) + hold;
-            } else {
-                // Replace entire value
-                input.value = hold;
-            }
-            
-            input.focus();
-            document.getElementById('modalHoldsSuggestions').style.display = 'none';
-        }
-
-        // Close modal when clicking outside
-        document.getElementById('climbModal').addEventListener('click', (e) => {
-            if (e.target.id === 'climbModal') {
-                closeModal();
-            }
-        });
-
-        loadClimbs();
     </script>
 </body>
 </html>
