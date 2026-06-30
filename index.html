@@ -176,7 +176,7 @@
             $('#clearBtn').style.display = selectedSearchHolds.length ? 'inline-block' : 'none';
         }
         function removeSearchTag(tag){ selectedSearchHolds = selectedSearchHolds.filter(t=>t!==tag); renderSearchTags(); filterClimbs(); }
-        function renderSearchTags(){ const container = $('#searchTags'); container.innerHTML=''; if(selectedSearchHolds.length===0){ const ph=document.createElement('div'); ph.className='selected-placeholder'; ph.textContent='Type hold name and press Enter or choose suggestion'; container.appendChild(ph); return }
+        function renderSearchTags(){ const container = $('#searchTags'); container.innerHTML=''; if(selectedSearchHolds.length===0){ const ph=document.createElement('div'); ph.className='selected-placeholder'; ph.textContent=''; container.appendChild(ph); return }
             selectedSearchHolds.forEach(t=>{ const sp=document.createElement('span'); sp.className='tag primary'; sp.textContent=t; const rem=document.createElement('span'); rem.className='remove'; rem.textContent='×'; rem.addEventListener('click', ()=>removeSearchTag(t)); sp.appendChild(rem); container.appendChild(sp); }); }
 
         // Tag management - modal
