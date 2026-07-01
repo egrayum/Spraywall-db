@@ -113,6 +113,7 @@
                 rebuildHoldsMap();
                 renderSuggestions();
                 renderClimbs(allClimbs);
+                console.log('index.html loaded - working-2');
             }catch(e){
                 $('#climbList').innerHTML = '<p>Error loading climbs. Make sure the server is running.</p>';
                 console.error(e);
@@ -161,7 +162,8 @@
             let arr = [];
             if(Array.isArray(holds)) arr = holds;
             else if(typeof holds==='string') arr = holds.split(/[ ,]+/).filter(Boolean);
-            return arr.map(h=>`<span class="tag">${h}</span>`).join(' ');
+            // Make tags clickable by including data-hold
+            return arr.map(h=>`<span class="tag" data-hold="${h.toLowerCase()}">${h}</span>`).join(' ');
         }
 
         // Tag management - search
@@ -176,7 +178,7 @@
             $('#clearBtn').style.display = selectedSearchHolds.length ? 'inline-block' : 'none';
         }
         function removeSearchTag(tag){ selectedSearchHolds = selectedSearchHolds.filter(t=>t!==tag); renderSearchTags(); filterClimbs(); }
-        function renderSearchTags(){ const container = $('#searchTags'); container.innerHTML=''; if(selectedSearchHolds.length===0){ const ph=document.createElement('div'); ph.className='selected-placeholder'; ph.textContent=''; container.appendChild(ph); return }
+        function renderSearchTags(){ const container = $('#searchTags'); container.innerHTML=''; if(selectedSearchHolds.length===0){ const ph=document.createElement('div'); ph.className='selected-placeholder'; ph.textContent='Type hold name and press Enter or choose suggestion'; container.appendChild(ph); return }
             selectedSearchHolds.forEach(t=>{ const sp=document.createElement('span'); sp.className='tag primary'; sp.textContent=t; const rem=document.createElement('span'); rem.className='remove'; rem.textContent='×'; rem.addEventListener('click', ()=>removeSearchTag(t)); sp.appendChild(rem); container.appendChild(sp); }); }
 
         // Tag management - modal
@@ -202,9 +204,9 @@
             if(visible===0 && (selectedSearchHolds.length>0 || inputVal)){
                 const existingList = $('#climbList').querySelector('.climb-list');
                 if (existingList) existingList.style.display = 'none';
-                let nr = $('#climbList').querySelector('.no-results'); if(!nr){ nr=document.createElement('div'); nr.className='no-results'; $('#climbList').appendChild(nr);} nr.textContent = `No climbs found with "${selectedSearchHolds.join(', ') || inputVal}" holds.`; nr.style.display='block';
+                let nr = $('#climbList').querySelector('.no-results'); if(!nr){ nr=document.createElement('div'); nr.className='no-results'; $('#climbList').appendChild(nr);} nr.textContent = `No climbs found with \"${selectedSearchHolds.join(', ') || inputVal}\" holds.`; nr.style.display='block';
             }else{ const existingList = $('#climbList').querySelector('.climb-list'); if (existingList) existingList.style.display = 'block'; const nr = $('#climbList').querySelector('.no-results'); if (nr) nr.remove(); }
-            if(selectedSearchHolds.length>0) tally.textContent = `${Array.from($$('.climb-item')).filter(i=>!i.classList.contains('hidden')).length} routes use "${selectedSearchHolds.join(', ')}"`;
+            if(selectedSearchHolds.length>0) tally.textContent = `${Array.from($$('.climb-item')).filter(i=>!i.classList.contains('hidden')).length} routes use \"${selectedSearchHolds.join(', ')}\"`;
             $('#clearBtn').style.display = (selectedSearchHolds.length || inputVal) ? 'inline-block' : 'none';
         }
 
@@ -217,14 +219,12 @@
         }
         function filterModalHoldsSuggestions(){ const qv = $('#modalInput').value.toLowerCase(); const suggestions = $$('#modalHoldsSuggestions .hold-suggestion'); suggestions.forEach(s=>{ const h=s.dataset.hold; s.style.display = (!qv || h.includes(qv)) ? 'flex' : 'none'; }); $('#modalHoldsSuggestions').style.display = suggestions.some(s=>s.style.display!=='none') ? 'block' : 'none'; }
 
-        // Select from suggestion (modal vs search handled by attached listeners in renderSuggestions)
-
         // Input handlers
         document.addEventListener('DOMContentLoaded', ()=>{
             // search input
             const sInput = $('#searchInput');
             sInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); const v=sInput.value.trim().toLowerCase(); if(v) addSearchTag(v); } });
-            sInput.addEventListener('input', ()=> filterHoldsSuggestions());
+            sInput.addEventListener('input', ()=> { filterHoldsSuggestions(); filterClimbs(); });
             sInput.addEventListener('focus', ()=> { renderSuggestions(); filterHoldsSuggestions(); });
             sInput.addEventListener('blur', ()=> setTimeout(()=>$('#holdsSuggestions').style.display='none',150));
 
@@ -259,6 +259,15 @@
             // click outside modal closes
             $('#climbModal').addEventListener('click', (e)=>{ if(e.target.id==='climbModal') closeModal(); });
 
+            // delegation: clicking a hold tag in the climb list adds it to search
+            $('#climbList').addEventListener('click', (e)=>{
+                const tag = e.target.closest('.tag');
+                if(tag && $('#climbList').contains(tag)){
+                    const hold = tag.dataset.hold || tag.textContent.trim().toLowerCase();
+                    if(hold) addSearchTag(hold);
+                }
+            });
+
             // initial renders
             renderSearchTags(); renderModalTags(); loadClimbs();
         });
@@ -268,7 +277,7 @@
         function openEditModal(index){ const c = allClimbs[index]; $('#modalTitle').textContent='Edit Climb'; $('#submitBtn').textContent='Save Changes'; $('#editIndex').value=index; $('#climbName').value=c.name||''; selectedModalHolds = (typeof c.holds==='string')? c.holds.split(/[ ,]+/).filter(Boolean).map(h=>h.toLowerCase()) : (Array.isArray(c.holds)? c.holds.map(h=>String(h).toLowerCase()):[]); renderModalTags(); $('#climbFeet').value=c.feet||''; $('#climbDate').value=c.date||''; $('#climbDifficulty').value=c.difficulty||''; $('#climbModal').classList.add('show'); }
         function closeModal(){ $('#climbModal').classList.remove('show'); }
 
-        async function deleteClimb(index){ if(!confirm(`Are you sure you want to delete "${allClimbs[index].name}"?`)) return; try{ const res = await fetch(`/api/climbs/${index}`,{method:'DELETE'}); if(res.ok) await loadClimbs(); else alert('Error deleting climb'); }catch(e){ alert('Error deleting climb'); console.error(e); } }
+        async function deleteClimb(index){ if(!confirm(`Are you sure you want to delete \"${allClimbs[index].name}\"?`)) return; try{ const res = await fetch(`/api/climbs/${index}`,{method:'DELETE'}); if(res.ok) await loadClimbs(); else alert('Error deleting climb'); }catch(e){ alert('Error deleting climb'); console.error(e); } }
 
     </script>
 </body>
