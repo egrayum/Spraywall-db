@@ -106,6 +106,8 @@
         let holdsMap = {}; // hold -> count
         let selectedSearchHolds = []; // tags in search bar
         let selectedModalHolds = []; // tags in modal
+        let hideSuggestionsTimeout = null;
+        let hideModalSuggestionsTimeout = null;
 
         // Helpers
         const $ = (s, ctx=document) => ctx.querySelector(s);
@@ -141,8 +143,19 @@
             $('#holdsSuggestions').innerHTML = html;
             $('#modalHoldsSuggestions').innerHTML = html;
             // attach listeners
-            $$('#holdsSuggestions .hold-suggestion').forEach(el=>el.addEventListener('mousedown', (ev)=>{ addSearchTag(el.dataset.hold); ev.preventDefault(); }));
-            $$('#modalHoldsSuggestions .hold-suggestion').forEach(el=>el.addEventListener('mousedown', (ev)=>{ addModalTag(el.dataset.hold); ev.preventDefault(); }));
+            $$('#holdsSuggestions .hold-suggestion').forEach(el=>el.addEventListener('mousedown', (ev)=>{
+                ev.preventDefault();
+                if(hideSuggestionsTimeout){ clearTimeout(hideSuggestionsTimeout); hideSuggestionsTimeout = null; }
+                addSearchTag(el.dataset.hold);
+                // keep focus on input so user can continue adding
+                setTimeout(()=>{ $('#searchInput').focus(); renderSuggestions(); filterHoldsSuggestions(); },0);
+            }));
+            $$('#modalHoldsSuggestions .hold-suggestion').forEach(el=>el.addEventListener('mousedown', (ev)=>{
+                ev.preventDefault();
+                if(hideModalSuggestionsTimeout){ clearTimeout(hideModalSuggestionsTimeout); hideModalSuggestionsTimeout = null; }
+                addModalTag(el.dataset.hold);
+                setTimeout(()=>{ $('#modalInput').focus(); renderSuggestions(); filterModalHoldsSuggestions(); },0);
+            }));
         }
 
         function renderClimbs(climbs){
@@ -168,7 +181,7 @@
             if(Array.isArray(holds)) arr = holds;
             else if(typeof holds==='string') arr = holds.split(/[ ,]+/).filter(Boolean);
             // Make tags clickable by including data-hold
-            return arr.map(h=>`<span class="tag clickable" data-hold="${h.toLowerCase()}"><u>${h}</u></span>`).join(' ');
+            return arr.map(h=>`<span class="tag tag-borderless" data-hold="${h.toLowerCase()}">${h}</span>`).join(' ');
         }
 
         // Tag management - search
@@ -179,7 +192,7 @@
             renderSearchTags();
             filterClimbs();
             $('#searchInput').value='';
-            $('#holdsSuggestions').style.display='none';
+            $('#holdsSuggestions').style.display='block';
             $('#clearBtn').style.display = selectedSearchHolds.length ? 'inline-block' : 'none';
         }
         function removeSearchTag(tag){ selectedSearchHolds = selectedSearchHolds.filter(t=>t!==tag); renderSearchTags(); filterClimbs(); }
@@ -189,7 +202,7 @@
             selectedSearchHolds.forEach(t=>{ const sp=document.createElement('span'); sp.className='tag primary'; sp.textContent=t; const rem=document.createElement('span'); rem.className='remove'; rem.textContent='×'; rem.addEventListener('click', ()=>removeSearchTag(t)); sp.appendChild(rem); container.appendChild(sp); }); }
 
         // Tag management - modal
-        function addModalTag(tag){ tag=String(tag).toLowerCase(); if(!tag) return; if(!selectedModalHolds.includes(tag)) selectedModalHolds.push(tag); renderModalTags(); $('#modalInput').value=''; $('#modalHoldsSuggestions').style.display='none'; }
+        function addModalTag(tag){ tag=String(tag).toLowerCase(); if(!tag) return; if(!selectedModalHolds.includes(tag)) selectedModalHolds.push(tag); renderModalTags(); $('#modalInput').value=''; $('#modalHoldsSuggestions').style.display='block'; }
         function removeModalTag(tag){ selectedModalHolds = selectedModalHolds.filter(t=>t!==tag); renderModalTags(); }
         function renderModalTags(){ const c=$('#modalTags'); c.innerHTML=''; if(selectedModalHolds.length===0){ return } selectedModalHolds.forEach(t=>{ const sp=document.createElement('span'); sp.className='tag'; sp.textContent=t; const rem=document.createElement('span'); rem.className='remove'; rem.textContent='×'; rem.addEventListener('click', ()=>removeModalTag(t)); sp.appendChild(rem); c.appendChild(sp); }); }
 
@@ -204,8 +217,12 @@
                 let pass = true;
                 if(selectedSearchHolds.length>0){
                     for(const t of selectedSearchHolds){ if(!holds.includes(t)) { pass=false; break } }
-                } else if(inputVal){ pass = holds.includes(inputVal); }
-                if(pass){ it.classList.remove('hidden'); visible++ } else it.classList.add('hidden');
+                } else if(inputVal){
+                    // support tokenized input: require all tokens present
+                    const tokens = inputVal.split(/\s+/).filter(Boolean);
+                    for(const tk of tokens){ if(!holds.includes(tk)){ pass=false; break } }
+                }
+                if(pass){ it.classList.remove('hidden'); it.style.display=''; visible++ } else { it.classList.add('hidden'); it.style.display='none' }
             });
             const tally = $('#result-tally'); tally.textContent='';
             if(visible===0 && (selectedSearchHolds.length>0 || inputVal)){
@@ -233,7 +250,10 @@
             sInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); const v=sInput.value.trim().toLowerCase(); if(v) addSearchTag(v); } });
             sInput.addEventListener('input', ()=> { filterHoldsSuggestions(); filterClimbs(); });
             sInput.addEventListener('focus', ()=> { renderSuggestions(); filterHoldsSuggestions(); });
-            sInput.addEventListener('blur', ()=> setTimeout(()=>$('#holdsSuggestions').style.display='none',150));
+            sInput.addEventListener('blur', ()=>{
+                // delay hiding to allow mousedown handlers on suggestions to run and clear this timeout
+                hideSuggestionsTimeout = setTimeout(()=>$('#holdsSuggestions').style.display='none',150);
+            });
 
             $('#clearBtn').addEventListener('click', ()=>{ selectedSearchHolds=[]; $('#searchInput').value=''; renderSearchTags(); filterClimbs(); $('#clearBtn').style.display='none'; });
 
@@ -242,7 +262,9 @@
             mInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); const v=mInput.value.trim().toLowerCase(); if(v) addModalTag(v); } });
             mInput.addEventListener('input', ()=> filterModalHoldsSuggestions());
             mInput.addEventListener('focus', ()=> { renderSuggestions(); filterModalHoldsSuggestions(); });
-            mInput.addEventListener('blur', ()=> setTimeout(()=>$('#modalHoldsSuggestions').style.display='none',150));
+            mInput.addEventListener('blur', ()=>{
+                hideModalSuggestionsTimeout = setTimeout(()=>$('#modalHoldsSuggestions').style.display='none',150);
+            });
 
             // form submit wiring
             const form = $('#climbForm'); form.addEventListener('submit', async (e)=>{
