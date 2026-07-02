@@ -31,6 +31,8 @@
         .form-group{margin-bottom:12px}
         .form-group input, .form-group select{width:100%;padding:10px;border:2px solid #ddd;border-radius:6px}
         .selected-placeholder{color:#999;font-style:italic;padding:6px}
+        /* ensure hidden class actually hides elements */
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -206,9 +208,9 @@
             if(visible===0 && (selectedSearchHolds.length>0 || inputVal)){
                 const existingList = $('#climbList').querySelector('.climb-list');
                 if (existingList) existingList.style.display = 'none';
-                let nr = $('#climbList').querySelector('.no-results'); if(!nr){ nr=document.createElement('div'); nr.className='no-results'; $('#climbList').appendChild(nr);} nr.textContent = `No climbs found with "${selectedSearchHolds.join(', ') || inputVal}" holds.`; nr.style.display='block';
+                let nr = $('#climbList').querySelector('.no-results'); if(!nr){ nr=document.createElement('div'); nr.className='no-results'; $('#climbList').appendChild(nr);} nr.textContent = `No climbs found with \"${selectedSearchHolds.join(', ') || inputVal}\" holds.`; nr.style.display='block';
             }else{ const existingList = $('#climbList').querySelector('.climb-list'); if (existingList) existingList.style.display = 'block'; const nr = $('#climbList').querySelector('.no-results'); if (nr) nr.remove(); }
-            if(selectedSearchHolds.length>0) tally.textContent = `${Array.from($$('.climb-item')).filter(i=>!i.classList.contains('hidden')).length} routes use "${selectedSearchHolds.join(', ')}"`;
+            if(selectedSearchHolds.length>0) tally.textContent = `${Array.from($$('.climb-item')).filter(i=>!i.classList.contains('hidden')).length} routes use \"${selectedSearchHolds.join(', ')}\"`;
             $('#clearBtn').style.display = (selectedSearchHolds.length || inputVal) ? 'inline-block' : 'none';
         }
 
@@ -279,7 +281,7 @@
         function openEditModal(index){ const c = allClimbs[index]; $('#modalTitle').textContent='Edit Climb'; $('#submitBtn').textContent='Save Changes'; $('#editIndex').value=index; $('#climbName').value=c.name||''; selectedModalHolds = (typeof c.holds==='string')? c.holds.split(/[ ,]+/).filter(Boolean).map(h=>h.toLowerCase()) : (Array.isArray(c.holds)? c.holds.map(h=>String(h).toLowerCase()):[]); renderModalTags(); $('#climbFeet').value=c.feet||''; $('#climbDate').value=c.date||''; $('#climbDifficulty').value=c.difficulty||''; $('#climbModal').classList.add('show'); }
         function closeModal(){ $('#climbModal').classList.remove('show'); }
 
-        async function deleteClimb(index){ if(!confirm(`Are you sure you want to delete "${allClimbs[index].name}"?`)) return; try{ const res = await fetch(`/api/climbs/${index}`,{method:'DELETE'}); if(res.ok) await loadClimbs(); else alert('Error deleting climb'); }catch(e){ alert('Error deleting climb'); console.error(e); } }
+        async function deleteClimb(index){ if(!confirm(`Are you sure you want to delete \"${allClimbs[index].name}\"?`)) return; try{ const res = await fetch(`/api/climbs/${index}`,{method:'DELETE'}); if(res.ok) await loadClimbs(); else alert('Error deleting climb'); }catch(e){ alert('Error deleting climb'); console.error(e); } }
 
     </script>
 </body>
