@@ -9,7 +9,7 @@
         body { font-family: Arial, sans-serif; max-width:800px; margin:50px auto; padding:20px; background:#f5f5f5; }
         h1 { color:#333; margin:0 0 18px 0 }
         .search-container { margin-bottom:20px; }
-        .search-wrapper { position:relative; border:2px solid #ddd; border-radius:8px; padding:6px 10px; background:white; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+        .search-wrapper { position:relative; border:2px solid #ddd; border-radius:8px; padding:6px 10px; background:white; display:flex; gap:8px; align-items:center; flex-wrap:wrap; width:100%; }
         .tag { display:inline-flex; align-items:center; gap:8px; background:#ecf0f1; padding:6px 8px; border-radius:999px; font-size:13px; }
         .tag .remove { cursor:pointer; font-weight:700; padding-left:6px; }
         .tag.primary { background:#3498db; color:white }
@@ -30,12 +30,27 @@
         .modal.show{display:flex}
         .modal-content{background:white;padding:20px;border-radius:8px;width:92%;max-width:540px;max-height:90vh;overflow:auto}
         .form-group{margin-bottom:12px}
-        .form-group input, .form-group select{width:100%;padding:10px;border:2px solid #ddd;border-radius:6px}
+        .form-group input, .form-group select{width:100%;padding:10px;border:2px solid #ddd;border-radius:6px;font-size:16px}
         .selected-placeholder{color:#999;font-style:italic;padding:6px}
         /* ensure hidden class actually hides elements */
         .hidden { display: none !important; }
         .difficulty { background-color:#3498db; border-radius: 5px; width: fit-content; padding: 4px; color: white;}
         .tag-borderless { border: none !important; }
+
+        /* Matching modal inputs to the holds input field */
+        /* The holds input sits inside .search-wrapper which has 2px border, 8px radius and 6px/10px padding. Make modal inputs match visually */
+        .modal .form-group input, .modal .form-group select {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            box-sizing: border-box;
+            width: 100%;
+            background: white;
+            font-size: 15px;
+        }
+        .modal .search-wrapper { width: 100%; }
+
+        /* keep existing styles for other layout elements */
     </style>
 </head>
 <body>
