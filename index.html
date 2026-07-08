@@ -93,24 +93,24 @@
         <div class="button-group">
             <button class="add-btn" onclick="openAddModal()">+ Add New Climb</button>
             <div class="grade-filter-container">
-                <button class="filter-btn" id="gradeFilterBtn">Grade...</button>
+                <button class="filter-btn" id="gradeFilterBtn">🔽 Filter by Grade</button>
                 <div class="grade-filter-panel" id="gradeFilterPanel">
                     <div class="grade-checkbox-group">
                         <div class="grade-checkbox-item">
                             <input type="checkbox" id="grade1-4" value="1-4" class="grade-filter-checkbox">
-                            <label for="grade1-4">1-4</label>
+                            <label for="grade1-4">v1-4</label>
                         </div>
                         <div class="grade-checkbox-item">
                             <input type="checkbox" id="grade4-7" value="4-7" class="grade-filter-checkbox">
-                            <label for="grade4-7">4-7</label>
+                            <label for="grade4-7">v4-7</label>
                         </div>
                         <div class="grade-checkbox-item">
                             <input type="checkbox" id="grade7-9" value="7-9" class="grade-filter-checkbox">
-                            <label for="grade7-9">7-9</label>
+                            <label for="grade7-9">v7-9</label>
                         </div>
                         <div class="grade-checkbox-item">
                             <input type="checkbox" id="grade10plus" value="10+" class="grade-filter-checkbox">
-                            <label for="grade10plus">10+</label>
+                            <label for="grade10plus">v10+</label>
                         </div>
                     </div>
                 </div>
@@ -153,10 +153,10 @@
                     <label for="climbDifficulty">Difficulty</label>
                     <select id="climbDifficulty">
                         <option value="">Select difficulty...</option>
-                        <option>1-4</option>
-                        <option>4-7</option>
-                        <option>7-9</option>
-                        <option>10+</option>
+                        <option>v1-4</option>
+                        <option>v4-7</option>
+                        <option>v7-9</option>
+                        <option>v10+</option>
                     </select>
                 </div>
                 <div class="modal-buttons">
@@ -176,6 +176,9 @@
         let selectedGradeFilters = []; // selected grade filters
         let hideSuggestionsTimeout = null;
         let hideModalSuggestionsTimeout = null;
+
+        // Grade sort order
+        const gradeOrder = { '1-4': 0, '4-7': 1, '7-9': 2, '10+': 3 };
 
         // Helpers
         const $ = (s, ctx=document) => ctx.querySelector(s);
@@ -300,13 +303,15 @@
             filterClimbs();
         }
 
-        // Update the filter button text with selected grades
+        // Update the filter button text with selected grades sorted from lowest to highest with v prefix
         function updateGradeFilterButtonText(){
             const btn = $('#gradeFilterBtn');
             if(selectedGradeFilters.length === 0){
-                btn.textContent = 'Grade...';
+                btn.textContent = '🔽 Filter by Grade';
             } else {
-                btn.textContent = `🔽 ${selectedGradeFilters.join(', ')}`;
+                const sortedGrades = selectedGradeFilters.sort((a, b) => gradeOrder[a] - gradeOrder[b]);
+                const gradeText = sortedGrades.map(g => `v${g}`).join(', ');
+                btn.textContent = `🔽 ${gradeText}`;
             }
         }
 
