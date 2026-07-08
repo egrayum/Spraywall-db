@@ -238,7 +238,7 @@
                 const holdsText = (Array.isArray(c.holds)?c.holds.join(' '):String(c.holds||'')).toLowerCase();
                 li.dataset.holds = holdsText;
                 li.dataset.difficulty = c.difficulty || '';
-                li.innerHTML = `<div class="climb-details"><div class="climb-name">${c.name||''}</div><div class='climb-info'><strong>Holds:</strong> ${formatHoldsInline(c.holds)}</div><div class='climb-info'>${c.feet?'<strong>Feet:</strong> '+c.feet+' ':''}${c.date?'<strong>Date:</strong> '+c.date+' ':''}</div><div>${c.difficulty?'<span class="difficulty">'+c.difficulty+'</span>':''}</div></div>`;
+                li.innerHTML = `<div class="climb-details"><div class="climb-name">${c.name||''}</div><div class='climb-info'><strong>Holds:</strong> ${formatHoldsInline(c.holds)}</div><div class='climb-info'>${c.feet?'<strong>Feet:</strong> '+c.feet+' ':''}${c.date?'<strong>Date:</strong> '+c.date+' ':''}</div><div>${c.difficulty?'<span class="difficulty">v'+c.difficulty+'</span>':''}</div></div>`;
                 const actions = document.createElement('div'); actions.className='climb-actions';
                 const ebtn=document.createElement('button'); ebtn.className='edit-btn'; ebtn.textContent='Edit'; ebtn.addEventListener('click', ()=> openEditModal(i));
                 const dbtn=document.createElement('button'); dbtn.className='delete-btn'; dbtn.textContent='Delete'; dbtn.addEventListener('click', ()=> deleteClimb(i));
