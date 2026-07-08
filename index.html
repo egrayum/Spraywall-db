@@ -38,7 +38,8 @@
         /* ensure hidden class actually hides elements */
         .hidden { display: none !important; }
         .difficulty { background-color:#3498db; border-radius: 5px; width: fit-content; padding: 4px; color: white;}
-        .tag-borderless { border: none !important; }
+        .tag-borderless { border: none !important; cursor: pointer;}
+        .climb-info{ padding: 2px 0 2px 0}
 
         /* Matching modal inputs to the holds input field */
         /* The holds input sits inside .search-wrapper which has 2px border, 8px radius and 6px/10px padding. Make modal inputs match visually */
@@ -234,7 +235,7 @@
                 const holdsText = (Array.isArray(c.holds)?c.holds.join(' '):String(c.holds||'')).toLowerCase();
                 li.dataset.holds = holdsText;
                 li.dataset.difficulty = c.difficulty || '';
-                li.innerHTML = `<div class="climb-details"><div class="climb-name">${c.name||''}</div><div><strong>Holds:</strong> ${formatHoldsInline(c.holds)}</div><div>${c.feet?'<strong>Feet:</strong> '+c.feet+' ':''}${c.date?'<strong>Date:</strong> '+c.date+' ':''}</div><div>${c.difficulty?'<span class="difficulty">'+c.difficulty+'</span>':''}</div></div>`;
+                li.innerHTML = `<div class="climb-details"><div class="climb-name">${c.name||''}</div><div class='climb-info'><strong>Holds:</strong> ${formatHoldsInline(c.holds)}</div><div class='climb-info'>${c.feet?'<strong>Feet:</strong> '+c.feet+' ':''}</div><div class='climb-info'>${c.difficulty?'<span class="difficulty">'+c.difficulty+'</span>':''}</div></div>`;
                 const actions = document.createElement('div'); actions.className='climb-actions';
                 const ebtn=document.createElement('button'); ebtn.className='edit-btn'; ebtn.textContent='Edit'; ebtn.addEventListener('click', ()=> openEditModal(i));
                 const dbtn=document.createElement('button'); dbtn.className='delete-btn'; dbtn.textContent='Delete'; dbtn.addEventListener('click', ()=> deleteClimb(i));
@@ -249,7 +250,7 @@
             if(Array.isArray(holds)) arr = holds;
             else if(typeof holds==='string') arr = holds.split(/[ ,]+/).filter(Boolean);
             // Make tags clickable by including data-hold
-            return arr.map(h=>`<span class="tag tag-borderless" data-hold="${h.toLowerCase()}">${h}</span>`).join(' ');
+            return arr.map(h=>`<span class="tag tag-borderless" data-hold="${h.toLowerCase()}"><u>${h}</u></span>`).join(' ');
         }
 
         // Tag management - search
