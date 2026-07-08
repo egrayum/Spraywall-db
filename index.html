@@ -91,9 +91,9 @@
             <div id="holdsSuggestions" class="holds-suggestions" style="display:none"></div>
         </div>
         <div class="button-group">
-            <button class="add-btn" onclick="openAddModal()">+ Add New Climb</button>
+            <button class="add-btn" onclick="openAddModal()">+ Add Climb</button>
             <div class="grade-filter-container">
-                <button class="filter-btn" id="gradeFilterBtn">🔽 Filter by Grade</button>
+                <button class="filter-btn" id="gradeFilterBtn">Grade...</button>
                 <div class="grade-filter-panel" id="gradeFilterPanel">
                     <div class="grade-checkbox-group">
                         <div class="grade-checkbox-item">
@@ -124,7 +124,7 @@
     <!-- Add/Edit Modal -->
     <div id="climbModal" class="modal">
         <div class="modal-content">
-            <div id="modalTitle" class="modal-header">Add New Climb</div>
+            <div id="modalTitle" class="modal-header">Add Climb</div>
             <form id="climbForm">
                 <input type="hidden" id="editIndex" value="-1">
                 <div class="form-group">
@@ -307,7 +307,7 @@
         function updateGradeFilterButtonText(){
             const btn = $('#gradeFilterBtn');
             if(selectedGradeFilters.length === 0){
-                btn.textContent = '🔽 Filter by Grade';
+                btn.textContent = 'Grade...';
             } else {
                 const sortedGrades = selectedGradeFilters.sort((a, b) => gradeOrder[a] - gradeOrder[b]);
                 const gradeText = sortedGrades.map(g => `v${g}`).join(', ');
@@ -435,7 +435,7 @@
         });
 
         // Edit modal
-        function openAddModal(){ $('#modalTitle').textContent='Add New Climb'; $('#submitBtn').textContent='Add Climb'; $('#editIndex').value='-1'; $('#climbForm').reset(); selectedModalHolds=[]; renderModalTags(); $('#modalInput').focus(); $('#climbModal').classList.add('show'); }
+        function openAddModal(){ $('#modalTitle').textContent='Add Climb'; $('#submitBtn').textContent='Add Climb'; $('#editIndex').value='-1'; $('#climbForm').reset(); selectedModalHolds=[]; renderModalTags(); $('#modalInput').focus(); $('#climbModal').classList.add('show'); }
         function openEditModal(index){ const c = allClimbs[index]; $('#modalTitle').textContent='Edit Climb'; $('#submitBtn').textContent='Save Changes'; $('#editIndex').value=index; $('#climbName').value=c.name||''; $('#climbFeet').value=c.feet||''; $('#climbDate').value=c.date||''; $('#climbDifficulty').value=c.difficulty||''; selectedModalHolds = []; if(Array.isArray(c.holds)) selectedModalHolds=c.holds.map(h=>String(h).toLowerCase()); else if(typeof c.holds==='string') selectedModalHolds=c.holds.split(/[ ,]+/).map(h=>h.trim().toLowerCase()).filter(Boolean); renderModalTags(); $('#climbModal').classList.add('show'); }
         function closeModal(){ $('#climbModal').classList.remove('show'); }
 
