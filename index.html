@@ -93,7 +93,7 @@
         <div class="button-group">
             <button class="add-btn" onclick="openAddModal()">+ Add Climb</button>
             <div class="grade-filter-container">
-                <button class="filter-btn" id="gradeFilterBtn">Grade...</button>
+                <button class="filter-btn" id="gradeFilterBtn">🔽 Filter by Grade</button>
                 <div class="grade-filter-panel" id="gradeFilterPanel">
                     <div class="grade-checkbox-group">
                         <div class="grade-checkbox-item">
@@ -144,10 +144,6 @@
                 <div class="form-group">
                     <label for="climbFeet">Feet</label>
                     <input type="text" id="climbFeet">
-                </div>
-                <div class="form-group">
-                    <label for="climbDate">Date</label>
-                    <input type="date" id="climbDate">
                 </div>
                 <div class="form-group">
                     <label for="climbDifficulty">Difficulty</label>
@@ -238,7 +234,7 @@
                 const holdsText = (Array.isArray(c.holds)?c.holds.join(' '):String(c.holds||'')).toLowerCase();
                 li.dataset.holds = holdsText;
                 li.dataset.difficulty = c.difficulty || '';
-                li.innerHTML = `<div class="climb-details"><div class="climb-name">${c.name||''}</div><div class='climb-info'><strong>Holds:</strong> ${formatHoldsInline(c.holds)}</div><div class='climb-info'>${c.feet?'<strong>Feet:</strong> '+c.feet+' ':''}${c.date?'<strong>Date:</strong> '+c.date+' ':''}</div><div>${c.difficulty?'<span class="difficulty">v'+c.difficulty+'</span>':''}</div></div>`;
+                li.innerHTML = `<div class="climb-details"><div class="climb-name">${c.name||''}</div><div class='climb-info'><strong>Holds:</strong> ${formatHoldsInline(c.holds)}</div><div class='climb-info'>${c.feet?'<strong>Feet:</strong> '+c.feet+' ':''}</div><div>${c.difficulty?'<span class="difficulty">'+c.difficulty+'</span>':''}</div></div>`;
                 const actions = document.createElement('div'); actions.className='climb-actions';
                 const ebtn=document.createElement('button'); ebtn.className='edit-btn'; ebtn.textContent='Edit'; ebtn.addEventListener('click', ()=> openEditModal(i));
                 const dbtn=document.createElement('button'); dbtn.className='delete-btn'; dbtn.textContent='Delete'; dbtn.addEventListener('click', ()=> deleteClimb(i));
@@ -307,7 +303,7 @@
         function updateGradeFilterButtonText(){
             const btn = $('#gradeFilterBtn');
             if(selectedGradeFilters.length === 0){
-                btn.textContent = 'Grade...';
+                btn.textContent = '🔽 Filter by Grade';
             } else {
                 const sortedGrades = selectedGradeFilters.sort((a, b) => gradeOrder[a] - gradeOrder[b]);
                 const gradeText = sortedGrades.map(g => `v${g}`).join(', ');
@@ -407,7 +403,6 @@
                     name: $('#climbName').value,
                     holds: selectedModalHolds.join(' '),
                     feet: $('#climbFeet').value,
-                    date: $('#climbDate').value,
                     difficulty: $('#climbDifficulty').value
                 };
                 try{
@@ -436,7 +431,7 @@
 
         // Edit modal
         function openAddModal(){ $('#modalTitle').textContent='Add Climb'; $('#submitBtn').textContent='Add Climb'; $('#editIndex').value='-1'; $('#climbForm').reset(); selectedModalHolds=[]; renderModalTags(); $('#modalInput').focus(); $('#climbModal').classList.add('show'); }
-        function openEditModal(index){ const c = allClimbs[index]; $('#modalTitle').textContent='Edit Climb'; $('#submitBtn').textContent='Save Changes'; $('#editIndex').value=index; $('#climbName').value=c.name||''; $('#climbFeet').value=c.feet||''; $('#climbDate').value=c.date||''; $('#climbDifficulty').value=c.difficulty||''; selectedModalHolds = []; if(Array.isArray(c.holds)) selectedModalHolds=c.holds.map(h=>String(h).toLowerCase()); else if(typeof c.holds==='string') selectedModalHolds=c.holds.split(/[ ,]+/).map(h=>h.trim().toLowerCase()).filter(Boolean); renderModalTags(); $('#climbModal').classList.add('show'); }
+        function openEditModal(index){ const c = allClimbs[index]; $('#modalTitle').textContent='Edit Climb'; $('#submitBtn').textContent='Save Changes'; $('#editIndex').value=index; $('#climbName').value=c.name||''; $('#climbFeet').value=c.feet||''; $('#climbDifficulty').value=c.difficulty||''; selectedModalHolds = []; if(Array.isArray(c.holds)) selectedModalHolds=c.holds.map(h=>String(h).toLowerCase()); else if(typeof c.holds==='string') selectedModalHolds=c.holds.split(/[ ,]+/).map(h=>h.trim().toLowerCase()).filter(Boolean); renderModalTags(); $('#climbModal').classList.add('show'); }
         function closeModal(){ $('#climbModal').classList.remove('show'); }
 
         async function deleteClimb(index){ if(!confirm(`Are you sure you want to delete "${allClimbs[index].name}"?`)) return; try{ const res = await fetch(`/api/climbs/${index}`,{method:'DELETE'}); if(res.ok){ await loadClimbs(); } else alert('Error deleting climb'); }catch(err){ alert('Error deleting climb'); console.error(err); } }
