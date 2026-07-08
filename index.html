@@ -235,7 +235,7 @@
                 const holdsText = (Array.isArray(c.holds)?c.holds.join(' '):String(c.holds||'')).toLowerCase();
                 li.dataset.holds = holdsText;
                 li.dataset.difficulty = c.difficulty || '';
-                li.innerHTML = `<div class="climb-details"><div class="climb-name">${c.name||''}</div><div class='climb-info'><strong>Holds:</strong> ${formatHoldsInline(c.holds)}</div><div class='climb-info'>${c.feet?'<strong>Feet:</strong> '+c.feet+' ':''}</div><div class='climb-info'>${c.difficulty?'<span class="difficulty">'+c.difficulty+'</span>':''}</div></div>`;
+                li.innerHTML = `<div class="climb-details"><div class="climb-name">${c.name||''}</div><div class='climb-info'><strong>Holds:</strong> ${formatHoldsInline(c.holds)}</div><div class='climb-info'>${c.feet?'<strong>Feet:</strong> '+c.feet+' ':''}${c.date?'<strong>Date:</strong> '+c.date+' ':''}</div><div>${c.difficulty?'<span class="difficulty">'+c.difficulty+'</span>':''}</div></div>`;
                 const actions = document.createElement('div'); actions.className='climb-actions';
                 const ebtn=document.createElement('button'); ebtn.className='edit-btn'; ebtn.textContent='Edit'; ebtn.addEventListener('click', ()=> openEditModal(i));
                 const dbtn=document.createElement('button'); dbtn.className='delete-btn'; dbtn.textContent='Delete'; dbtn.addEventListener('click', ()=> deleteClimb(i));
@@ -264,6 +264,19 @@
             $('#holdsSuggestions').style.display='block';
             $('#clearBtn').style.display = selectedSearchHolds.length ? 'inline-block' : 'none';
         }
+        
+        // Add a tag from clicking a hold without showing suggestions
+        function addSearchTagFromClick(tag){
+            tag = String(tag).toLowerCase();
+            if(!tag) return;
+            if(!selectedSearchHolds.includes(tag)) selectedSearchHolds.push(tag);
+            renderSearchTags();
+            filterClimbs();
+            $('#searchInput').value='';
+            $('#holdsSuggestions').style.display='none';
+            $('#clearBtn').style.display = selectedSearchHolds.length ? 'inline-block' : 'none';
+        }
+        
         function removeSearchTag(tag){ selectedSearchHolds = selectedSearchHolds.filter(t=>t!==tag); renderSearchTags(); filterClimbs(); }
         function renderSearchTags(){ const container = $('#searchTags'); container.innerHTML='';
             // When no selected tags, leave the tag area empty so the input's placeholder is fully visible
@@ -392,12 +405,12 @@
             // click outside modal closes
             $('#climbModal').addEventListener('click', (e)=>{ if(e.target.id==='climbModal') closeModal(); });
 
-            // delegation: clicking a hold tag in the climb list adds it to search
+            // delegation: clicking a hold tag in the climb list adds it to search WITHOUT showing suggestions
             $('#climbList').addEventListener('click', (e)=>{
                 const tag = e.target.closest('.tag');
                 if(tag && $('#climbList').contains(tag)){
                     const hold = tag.dataset.hold || tag.textContent.trim().toLowerCase();
-                    if(hold) addSearchTag(hold);
+                    if(hold) addSearchTagFromClick(hold);
                 }
             });
 
