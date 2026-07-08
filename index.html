@@ -296,7 +296,18 @@
             } else {
                 selectedGradeFilters.push(grade);
             }
+            updateGradeFilterButtonText();
             filterClimbs();
+        }
+
+        // Update the filter button text with selected grades
+        function updateGradeFilterButtonText(){
+            const btn = $('#gradeFilterBtn');
+            if(selectedGradeFilters.length === 0){
+                btn.textContent = '🔽 Filter by Grade';
+            } else {
+                btn.textContent = `🔽 ${selectedGradeFilters.join(', ')}`;
+            }
         }
 
         // Filtering
